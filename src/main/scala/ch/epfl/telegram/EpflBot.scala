@@ -1,17 +1,22 @@
 
-import info.mukel.telegrambot4s._, api._, methods._, models._, Implicits._
-
+import info.mukel.telegrambot4s._
+import api._
+import methods._
+import models._
+import Implicits._
 import java.net.URLEncoder
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
+import ch.epfl.telegram.TL
 
-object EpflBot extends TelegramBot with Polling with Commands with ChatActions {
+object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL {
+
 
   // PUT YOU TOKEN HERE
-  def token = scala.io.Source.fromFile("epflbot.token").getLines().next
+  def token = scala.io.Source.fromFile("menial_bot.token").getLines().next
 
   val ttsApiBase = "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q="
 
@@ -38,6 +43,7 @@ object EpflBot extends TelegramBot with Polling with Commands with ChatActions {
       disableWebPagePreview = true
     )
   }
+
 
   def main(args: Array[String]): Unit = {
     run()
