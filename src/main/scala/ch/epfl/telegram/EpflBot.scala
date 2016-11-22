@@ -16,7 +16,7 @@ object EpflBot extends TelegramBot with Polling with Commands with ChatActions w
 
 
   // PUT YOU TOKEN HERE
-  def token = scala.io.Source.fromFile("menial_bot.token").getLines().next
+  def token = scala.io.Source.fromFile("token").getLines().next
 
   val ttsApiBase = "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q="
 

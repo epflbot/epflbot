@@ -1,4 +1,16 @@
+name := "Apety-server"
+version := "0.1.0"
+
 scalaVersion := "2.11.8"
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-encoding",
+  "UTF-8",
+  "-feature",
+  "-unchecked",
+  "-Xfatal-warnings",
+  "-Xlint:_"
+)
 
 resolvers += "jitpack" at "https://jitpack.io"
 
