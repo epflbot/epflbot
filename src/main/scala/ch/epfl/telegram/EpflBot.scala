@@ -10,10 +10,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
-import ch.epfl.telegram.TL
+import ch.epfl.telegram.{DirectoryScraper, EpflDirectory, TL}
 
-object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL {
-
+object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL with EpflDirectory {
 
   // PUT YOU TOKEN HERE
   def token = scala.io.Source.fromFile("menial_bot.token").getLines().next
@@ -43,7 +42,6 @@ object EpflBot extends TelegramBot with Polling with Commands with ChatActions w
       disableWebPagePreview = true
     )
   }
-
 
   def main(args: Array[String]): Unit = {
     run()
