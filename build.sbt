@@ -18,7 +18,7 @@ resolvers += Resolver.sonatypeRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 libraryDependencies ++= Seq(
-  "com.github.mukel" %% "telegrambot4s" % "v1.2.2",
+  "com.github.mukel" %% "telegrambot4s" % "v2.0.1",
   "net.ruippeixotog" %% "scala-scraper" % "1.1.0",
   "com.github.nscala-time" %% "nscala-time" % "2.14.0",
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.0.0",

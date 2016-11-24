@@ -30,7 +30,7 @@ object EpflBot extends TelegramBot with Polling with Commands with ChatActions w
     } /* do */ {
       uploadingAudio // hint the user
       val voiceMp3 = InputFile.FromByteString("voice.mp3", bytes)
-      api.request(SendVoice(msg.sender, voiceMp3))
+      request(SendVoice(msg.sender, voiceMp3))
 
       // Simple Java integration example for John.
       reply(MyFunctions.hello())

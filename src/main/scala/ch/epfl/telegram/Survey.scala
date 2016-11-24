@@ -3,7 +3,7 @@ package ch.epfl.telegram
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri}
 import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
-import info.mukel.telegrambot4s.methods.SendMessage
+import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.models.{KeyboardButton, Message, ReplyKeyboardMarkup, ReplyMarkup}
 import org.elasticsearch.common.settings.Settings
 import org.joda.time.DateTime
@@ -26,18 +26,12 @@ trait Survey extends Commands { _: TelegramBot =>
       questions.find(q => !responses.contains(q._1)) match {
         case Some((nextQuestion, answers)) =>
           val buttons = answers.map(KeyboardButton(_)).grouped(2).toList
-          reply(nextQuestion, ReplyKeyboardMarkup(buttons, oneTimeKeyboard = Some(true)))
+          reply(nextQuestion, replyMarkup = ReplyKeyboardMarkup(buttons, oneTimeKeyboard = Some(true)))
         case None =>
           reply("Thanks, this is survey is completed!")
       }
     }
   }
-
-  private def reply(text: String, replyMarkup: ReplyMarkup)(
-    implicit message: Message): Future[Message] = {
-    api.request(SendMessage(Left(message.chat.id), text, replyMarkup = Some(replyMarkup)))
-  }
-
 }
 
 object Survey {
