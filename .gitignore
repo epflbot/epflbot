@@ -1,7 +1,5 @@
 *.class
 *.log
-
-# sbt specific
 .cache
 .history
 .lib/
@@ -11,7 +9,9 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
-
-# Scala-IDE specific
 .scala_dependencies
 .worksheet
+.ensime_cache/
+.ensime
+.idea
+token

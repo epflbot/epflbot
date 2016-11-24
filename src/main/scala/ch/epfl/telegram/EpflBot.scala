@@ -10,13 +10,13 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
-import ch.epfl.telegram.TL
+import ch.epfl.telegram.{Survey, TL}
 
-object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL {
+object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL with Survey {
 
 
   // PUT YOU TOKEN HERE
-  def token = scala.io.Source.fromFile("menial_bot.token").getLines().next
+  def token = scala.io.Source.fromFile("token").getLines().next
 
   val ttsApiBase = "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q="
 
