@@ -18,12 +18,12 @@ import scala.util.{Failure, Success}
 /**
   * Created by aimee on 11/22/16.
   */
-trait EpflDirectory extends TelegramBot {
+trait InlineEpflDirectory extends TelegramBot {
 
   override def onInlineQuery(inlineQuery: InlineQuery) : Unit = {
 
     println(s"Query: ${inlineQuery.query}")
-    val t = Try(DirectoryScraper.getPersons(inlineQuery.query))
+    val t = Try(DirectoryScraper.search(inlineQuery.query))
     println(t)
     val persons = t.getOrElse(Seq.empty)
 
@@ -49,12 +49,16 @@ trait EpflDirectory extends TelegramBot {
 
 case class Person(name: String, mail: String, url : String, function: String, unit : String, photo : Option[String] )
 
-object DirectoryScraper {
+trait EpflDirectory {
+  def search (query : String) : Seq[Person]
+}
+
+object DirectoryScraper extends EpflDirectory {
   val browser = new JsoupBrowser
   //TODO For now only 10 result, the ideal is to load results when scrolling
   val base_url = "https://search.epfl.ch/psearch.action?q="
 
-  def getPersons(query : String) : Seq[Person] = {
+  def search(query : String) : Seq[Person] = {
     val doc = browser.get(base_url + URLEncoder.encode(query, "UTF-8"))
     val option_list = doc >?> element("#search-results > ol")
 

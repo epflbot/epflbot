@@ -10,10 +10,10 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
-import ch.epfl.telegram.{DirectoryScraper, EpflDirectory, Survey, TL}
+import ch.epfl.telegram.{DirectoryScraper, InlineEpflDirectory, Survey, TL}
 
-object EpflBot extends TelegramBot with Polling with Commands with ChatActions
-  with TL with Survey with EpflDirectory {
+object InlineEpflBot extends TelegramBot with Polling with Commands with ChatActions
+  with TL with Survey with InlineEpflDirectory {
 
   // PUT YOU TOKEN HERE
   def token = scala.io.Source.fromFile("token").getLines().next
