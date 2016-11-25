@@ -10,12 +10,13 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
-import ch.epfl.telegram.{DirectoryScraper, EpflDirectory, TL}
+import ch.epfl.telegram.{DirectoryScraper, EpflDirectory, Survey, TL}
 
-object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL with EpflDirectory {
+object EpflBot extends TelegramBot with Polling with Commands with ChatActions
+  with TL with Survey with EpflDirectory {
 
   // PUT YOU TOKEN HERE
-  def token = scala.io.Source.fromFile("menial_bot.token").getLines().next
+  def token = scala.io.Source.fromFile("token").getLines().next
 
   val ttsApiBase = "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q="
 
@@ -29,7 +30,7 @@ object EpflBot extends TelegramBot with Polling with Commands with ChatActions w
     } /* do */ {
       uploadingAudio // hint the user
       val voiceMp3 = InputFile.FromByteString("voice.mp3", bytes)
-      api.request(SendVoice(msg.sender, voiceMp3))
+      request(SendVoice(msg.sender, voiceMp3))
 
       // Simple Java integration example for John.
       reply(MyFunctions.hello())
@@ -44,6 +45,7 @@ object EpflBot extends TelegramBot with Polling with Commands with ChatActions w
   }
 
   def main(args: Array[String]): Unit = {
+    //DirectoryScraper.getPersons("Sophia")
     run()
   }
 }
