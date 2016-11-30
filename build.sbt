@@ -1,4 +1,4 @@
-name := "Apety-server"
+name := "EPFLBot"
 version := "0.1.0"
 
 scalaVersion := "2.11.8"
@@ -17,9 +17,8 @@ resolvers += Resolver.sonatypeRepo("releases")
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
-libraryDependencies += "com.github.mukel" %% "telegrambot4s" % "v2.0.1" exclude("org.slf4j", "slf4j-log4j12")
-
 libraryDependencies ++= Seq(
+  "com.github.mukel" %% "telegrambot4s" % "v2.0.1" exclude ("org.slf4j", "slf4j-log4j12") exclude ("ch.qos.logback", "logback-classic"),
   "net.ruippeixotog" %% "scala-scraper" % "1.1.0",
   "com.github.nscala-time" %% "nscala-time" % "2.14.0",
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.0.0",
