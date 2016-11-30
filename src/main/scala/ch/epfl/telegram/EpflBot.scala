@@ -10,9 +10,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
-import ch.epfl.telegram.{Survey, TL, Occupancy}
+import ch.epfl.telegram.{Room, Survey, TL}
 
-object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL with Survey with Occupancy{
+object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL with Survey with Room{
 
 
   // PUT YOU TOKEN HERE

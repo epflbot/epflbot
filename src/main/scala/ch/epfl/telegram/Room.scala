@@ -9,18 +9,17 @@ import java.net.URLEncoder
 /**
   * Created by nghia on 30/11/16.
   */
-trait Occupancy extends Commands {
+trait Room extends Commands {
   _ : TelegramBot =>
 
-  on("/occupancy") { implicit msg => args =>
+  on("/room") { implicit msg => args =>
     reply(
-      "http://occupancy.epfl.ch/" + URLEncoder.encode(args mkString " ", "UTF-8"),
-      disableWebPagePreview = true
+      "http://occupancy.epfl.ch/" + URLEncoder.encode(args mkString " ", "UTF-8")
     )
   }
 }
 
 
-object Occupancy{
+object Room{
     val url = "http://occupancy.epfl.ch/"
 }
