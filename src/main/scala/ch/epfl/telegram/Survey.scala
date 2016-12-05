@@ -91,7 +91,6 @@ trait Survey extends Commands { _: TelegramBot =>
 
 object Survey {
 
-  // curl http://localhost:9200/indexName -X PUT
   val surveyStore   = "survey" / "welcome"
   val feedbackStore = "feedback" / "welcome"
 
