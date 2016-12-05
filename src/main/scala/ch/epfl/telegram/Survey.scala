@@ -18,7 +18,7 @@ trait Survey extends Commands { _: TelegramBot =>
 
   import Survey._
 
-  private def editMessage(message: Message, text: String, replyMarkup: Option[ReplyMarkup] = None): Future[_] =
+  private def editMessage(message: Message, text: String, replyMarkup: Option[ReplyMarkup] = None): Future[Message] =
     request(
       EditMessageText(
         chatId = message.chat.id,
@@ -32,7 +32,6 @@ trait Survey extends Commands { _: TelegramBot =>
   override def onCallbackQuery(cb: CallbackQuery): Unit = {
     cb match {
       case CallbackQuery(_, user, Some(message), _, _, Some(data), _) =>
-
         logger.debug("callback query data {}", data)
         val Array(questionIdx, answerIdx) = data.split(":").map(_.toInt)
         val (question, answer) =
@@ -45,7 +44,7 @@ trait Survey extends Commands { _: TelegramBot =>
           }
 
         for {
-          _ <- putAnswer(user.id, Map(question -> answer))
+          _    <- putAnswer(user.id, Map(question -> answer))
           next <- nextQuestion(user.id, Some(questionIdx + 1))
         } {
           next match {
@@ -82,7 +81,7 @@ trait Survey extends Commands { _: TelegramBot =>
   on("/feedback") { implicit msg => args =>
     for {
       user <- msg.from
-      _ <- putFeedback(user.id, args.mkString(" "))
+      _    <- putFeedback(user.id, args.mkString(" "))
     } {
       reply("Thanks for the comment!")
     }
@@ -90,46 +89,45 @@ trait Survey extends Commands { _: TelegramBot =>
 
 }
 
-
-
 object Survey {
 
   // curl http://localhost:9200/indexName -X PUT
-  val surveyStore = "survey" / "welcome"
+  val surveyStore   = "survey" / "welcome"
   val feedbackStore = "feedback" / "welcome"
 
   def putAnswer(userId: Long, responses: Map[String, String])(implicit ec: ExecutionContext): Future[Unit] =
     ElasticSearch {
       update(userId) in surveyStore docAsUpsert responses
-    } map(_ => ())
+    } map (_ => ())
 
   def getAnswers(userId: Long)(implicit ec: ExecutionContext): Future[Map[String, String]] = {
     ElasticSearch {
       get(userId) from surveyStore
-    } map(_.sourceAsMap.mapValues(_.toString))
+    } map (_.sourceAsMap.mapValues(_.toString))
   }
 
   def putFeedback(userId: Long, feedback: String)(implicit ec: ExecutionContext): Future[Unit] =
     ElasticSearch {
-      indexInto(feedbackStore) fields("user" -> userId, "feedback" -> feedback)
-    }  map (_ => ())
+      indexInto(feedbackStore) fields ("user" -> userId, "feedback" -> feedback)
+    } map (_ => ())
 
-  def nextQuestion(userId: Long, nextQuestionNumber: Option[Int] = None)(implicit ec: ExecutionContext)
-  : Future[Option[(String, InlineKeyboardMarkup)]] = {
+  def nextQuestion(userId: Long, nextQuestionNumber: Option[Int] = None)(
+      implicit ec: ExecutionContext): Future[Option[(String, InlineKeyboardMarkup)]] = {
 
     require(nextQuestionNumber.forall(_ >= 0), "next question number cannot have negative index")
     nextQuestionNumber match {
 
       case Some(step) if step < generalQuestions.size =>
         val (question, answers) = generalQuestions(step)
-        val buttons = answers.zipWithIndex.map { case (answer, i) =>
-          InlineKeyboardButton(answer, callbackData = s"$step:$i")
+        val buttons = answers.zipWithIndex.map {
+          case (answer, i) =>
+            InlineKeyboardButton(answer, callbackData = s"$step:$i")
         }.toList
         val next = s"*$question*" -> InlineKeyboardMarkup(buttons.grouped(2).toList)
         FastFuture.successful(next)
 
       case Some(step) if step < generalQuestions.size + servicesQuestions.size =>
-        val service = servicesQuestions(step - generalQuestions.size)
+        val service  = servicesQuestions(step - generalQuestions.size)
         val question = s"*How likely would you use the following service through EPFLBot?*\n\u27A1 _${service}_"
         val buttons = (1 to 3).map { i =>
           val answer = List.fill(i)("\u2B50").mkString
@@ -152,7 +150,7 @@ object Survey {
   }
 
   val introduction = "This is a quick survey to improve your EPFLBot experience :D.\n" +
-    "Answers are confidential and won't be publicly disclosed."
+      "Answers are confidential and won't be publicly disclosed."
 
   val generalQuestions = List(
     "What is your current position at EPFL?" -> List(
@@ -228,7 +226,7 @@ object Survey {
   )
 
   val conclusion = "You completed the whole survey \\o/. Thank you for your contributions!\n" +
-    "You can add your own ideas using:\n" +
-    "  _/feedback I'd like to see daily menu reminder!_"
+      "You can add your own ideas using:\n" +
+      "  _/feedback I'd like to see daily menu reminder!_"
 
 }
