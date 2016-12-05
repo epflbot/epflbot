@@ -9,7 +9,7 @@
         <Root level="debug">
             <AppenderRef ref="Console"/>
         </Root>
-        <Logger name="org.elasticsearch" level="warn" />
+        <Logger name="org.elasticsearch" level="info" />
         <Logger name="io.netty" level="warn" />
         <Logger name="netty" level="warn" />
     </Loggers>
