@@ -21,10 +21,12 @@ libraryDependencies ++= Seq(
   "com.github.mukel" %% "telegrambot4s" % "v2.0.1" exclude ("org.slf4j", "slf4j-log4j12") exclude ("ch.qos.logback", "logback-classic"),
   "net.ruippeixotog" %% "scala-scraper" % "1.1.0",
   "com.github.nscala-time" %% "nscala-time" % "2.14.0",
-  "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.0.0",
-  "com.sksamuel.elastic4s" %% "elastic4s-circe" % "5.0.0",
+  "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.0.4",
+  "com.sksamuel.elastic4s" %% "elastic4s-circe" % "5.0.4",
   "com.vividsolutions" % "jts" % "1.13",
   "org.locationtech.spatial4j" % "spatial4j" % "0.6",
-  "org.apache.logging.log4j" % "log4j-core" % "2.7",
-  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.7"
+  "org.apache.logging.log4j" % "log4j-core" % "2.6.2",
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.6.2"
 )
+
+scalafmtConfig := Some(file(".scalafmt.conf"))
