@@ -2,12 +2,10 @@ package ch.epfl.telegram
 
 import akka.http.scaladsl.util.FastFuture
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri, Executable}
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
 import info.mukel.telegrambot4s.models.{InlineKeyboardMarkup, _}
-import org.elasticsearch.common.settings.Settings
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -92,18 +90,7 @@ trait Survey extends Commands { _: TelegramBot =>
 
 }
 
-object ElasticSearch {
 
-  private val es = {
-    val settings = Settings.builder().put("cluster.name", "epflbot").build()
-    val uri = "elasticsearch://localhost:9300"
-    val client = ElasticClient.transport(settings, ElasticsearchClientUri(uri))
-    client
-  }
-
-  def apply[T, R, Q](t: T)(implicit executable: Executable[T, R, Q]): Future[Q] = es.execute(t)
-
-}
 
 object Survey {
 
