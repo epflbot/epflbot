@@ -28,3 +28,5 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-core" % "2.6.2",
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.6.2"
 )
+
+scalafmtConfig := Some(file(".scalafmt.conf"))
