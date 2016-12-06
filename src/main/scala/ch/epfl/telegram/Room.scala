@@ -4,6 +4,8 @@ import info.mukel.telegrambot4s._
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 
+import util.control.Breaks._
+
 import org.joda.time.DateTime
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -50,6 +52,7 @@ object Room{
 
   def buildQuery(room: String) = s"https://ewa.epfl.ch/room/Default.aspx?room=$room"
   val MAGIC_TOKEN = "v.events = "
+  val onlyToday = true   // onlyToday = false => show all events from today to the end of the week
 
   def get(s : String) : Future[String] = {
     var result = ""
@@ -61,8 +64,9 @@ object Room{
       if response.status.isSuccess()
       html <- Unmarshal(response.entity).to[String]
       jsEventsLine <- html.split("\n").find(_.startsWith(MAGIC_TOKEN))
-      json = jsEventsLine.drop(MAGIC_TOKEN.size)
-    } {
+      json = jsEventsLine.drop(MAGIC_TOKEN.size).replaceAll("l\\\\","L")
+    }
+    {
       import org.json4s._
       import org.json4s.jackson.JsonMethods._
 
@@ -73,29 +77,33 @@ object Room{
 
       val events = parse(json).extract[Array[Event]]
 
-     // events foreach println
-      /**/
+    val startDay = new DateTime()  // Today
+    var printedDay = startDay.minusDays(1)
 
-      var beginDate = new DateTime(events(0).Start.getOrElse(null).getTime)
-      result += "-----------"+beginDate.toDate.toString.substring(0, 10) + "-----------\n"
-      for (e <- events) {
-        // Date of this event
+    for (e <- events) {
+      breakable {
+        // Date of this event e
         val dateStartEvent = new DateTime(e.Start.getOrElse(null).getTime)
         val dateEndEvent = new DateTime(e.End.getOrElse(null).getTime)
-        if (beginDate.getDayOfYear != dateStartEvent.getDayOfYear) { // If there is a change in date
-          beginDate = dateStartEvent
-          result += "-----------"+beginDate.toDate.toString.substring(0, 10) + "-----------\n"
-        }
-        result = result.concat(e.Tag(0).substring(0, e.Tag(0).length-4))+" ["
-        result = result.concat(dateStartEvent.toDate.toString.substring(11,19)) +"--"
-        result = result.concat(dateEndEvent.toDate.toString.substring(11,19)+"]\n")
 
+        if (startDay.getDayOfYear > dateStartEvent.getDayOfYear)
+          break // continue
+        if (startDay.getDayOfYear < dateStartEvent.getDayOfYear && onlyToday)
+          break
+
+        if (printedDay.getDayOfYear < dateStartEvent.getDayOfYear) {
+          printedDay = dateStartEvent
+          result += "-----------" + dateStartEvent.toDate.toString.substring(0, 10) + "-----------\n"
+        }
+        result += e.Tag(0).substring(0, e.Tag(0).length - 4) + " ["
+        result += dateStartEvent.toDate.toString.substring(11, 19) + "--"
+        result += dateEndEvent.toDate.toString.substring(11, 19) + "]\n"
+        }
       }
 
-      p.success(result)
+    p.success(if(result.length == 0) "No Course" else result)
     }
-
-
-    p.future
+  p.future
   }
 }
+
