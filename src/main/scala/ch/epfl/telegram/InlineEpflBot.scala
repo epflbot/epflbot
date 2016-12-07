@@ -12,12 +12,12 @@ import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
 
 import scala.io.Source
+import scala.util.Properties
 
 object InlineEpflBot extends TelegramBot with Polling with Commands with ChatActions
   with TL with Survey with InlineEpflDirectory with Events {
 
-  // PUT YOU TOKEN HERE
-  lazy val token = Source.fromFile("token").getLines().mkString
+  lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
 
   val ttsApiBase = "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q="
 

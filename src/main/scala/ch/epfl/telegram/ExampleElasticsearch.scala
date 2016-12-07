@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object ExampleElasticsearch extends App {
+object ExampleElasticsearch /*extends App*/ {
 
   // should not use any waiting, for example purpose only
   def wait[T](f: Future[T]): T =
