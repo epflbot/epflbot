@@ -11,9 +11,12 @@ services:
     restart: unless-stopped
     links:
       - elasticsearch:elasticsearch
+      - logstash:logstash
     environment:
       - EPFLBOT_TOKEN
       - ELASTICSEARCH_INTERFACE=elasticsearch
+      - LOGSTASH_INTERFACE=logstash
+      - LOGSTASH_APPENDER=STASH
 
   elasticsearch:
     container_name: epflbot-data
@@ -29,5 +32,25 @@ services:
     restart: unless-stopped
     links:
       - elasticsearch:elasticsearch
+
+  nginx:
+    container_name: epflbot-proxy
+    image: beevelop/nginx-basic-auth
+    restart: unless-stopped
     ports:
-      - 5601:5601
+      - 7171:80
+    links:
+      - kibana:web
+    environment:
+      - HTPASSWD
+      - FORWARD_PORT=5601
+
+  logstash:
+    container_name: epflbot-log
+    image: logstash:5
+    restart: unless-stopped
+    volumes:
+      - ./logstash.conf:/etc/logstash/conf.d/logstash.conf:ro
+    links:
+      - elasticsearch:elasticsearch
+    entrypoint: "logstash -f /etc/logstash/conf.d/logstash.conf"
