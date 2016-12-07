@@ -22,3 +22,13 @@ echo "YOUR-TELEGRAM-TOKEN-HERE" > token
 sbt
 > ~re-start
 ```
+
+## Deploy
+
+```shell
+sbt clean assembly
+cd dock
+cp .env.example .env
+vim .env
+docker-compose up --build
+```

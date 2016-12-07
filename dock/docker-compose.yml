@@ -1,0 +1,33 @@
+version: '2'
+
+volumes:
+  epflbot-data:
+
+services:
+
+  java:
+    container_name: epflbot
+    build: .
+    restart: unless-stopped
+    links:
+      - elasticsearch:elasticsearch
+    environment:
+      - EPFLBOT_TOKEN
+      - ELASTICSEARCH_INTERFACE=elasticsearch
+
+  elasticsearch:
+    container_name: epflbot-data
+    image: elasticsearch:5
+    restart: unless-stopped
+    volumes:
+      - epflbot-data:/usr/share/elasticsearch/data
+    command: elasticsearch -E cluster.name=epflbot
+
+  kibana:
+    container_name: epflbot-interface
+    image: kibana:5
+    restart: unless-stopped
+    links:
+      - elasticsearch:elasticsearch
+    ports:
+      - 5601:5601

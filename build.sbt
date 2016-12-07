@@ -30,3 +30,14 @@ libraryDependencies ++= Seq(
 )
 
 scalafmtConfig := Some(file(".scalafmt.conf"))
+
+test in assembly := {}
+target in assembly := file("dock")
+assemblyJarName in assembly := "epflbot.jar"
+mainClass in assembly := Some("ch.epfl.telegram.InlineEpflBot")
+assemblyMergeStrategy in assembly := {
+  case "META-INF/io.netty.versions.properties" => MergeStrategy.first
+  case x if x.startsWith("org/apache/logging/log4j") => MergeStrategy.first
+  case x if x.startsWith("io/netty") => MergeStrategy.first
+  case x                                       => (assemblyMergeStrategy in assembly).value(x)
+}
