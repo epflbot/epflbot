@@ -32,7 +32,6 @@ trait Room extends Commands {
 
   on("/room") { implicit msg => args =>
     val responses =  Room.get(URLEncoder.encode(args mkString " ", "UTF-8"))
-    //for (response <- responses)
     reply(responses)
   }
 }
@@ -103,7 +102,7 @@ object Room{
 
       p.success(if(result.length == 0) "No Course" else result)
     }
-    Await.result(p.future, 10 second)
+    Await.result(p.future, 5 second)
   }
 }
 
