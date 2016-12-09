@@ -5,19 +5,20 @@ import java.net.URLEncoder
 import java.text.SimpleDateFormat
 
 import util.control.Breaks._
-
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, Seconds}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-
 import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{AnswerCallbackQuery, AnswerInlineQuery}
 import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
-
-import scala.concurrent.{Future, Promise}
+import scala.language.postfixOps
+import scala.concurrent.{Await, Future, Promise}
+import org.json4s._
+import scala.concurrent.duration._
+import org.json4s.jackson.JsonMethods._
 
 /**
   * Created by nghia on 30/11/16.
@@ -31,8 +32,8 @@ trait Room extends Commands {
 
   on("/room") { implicit msg => args =>
     val responses =  Room.get(URLEncoder.encode(args mkString " ", "UTF-8"))
-    for (response <- responses)
-      reply(response)
+    //for (response <- responses)
+    reply(responses)
   }
 }
 /*
@@ -54,7 +55,7 @@ object Room{
   val MAGIC_TOKEN = "v.events = "
   val onlyToday = true   // onlyToday = false => show all events from today to the end of the week
 
-  def get(s : String) : Future[String] = {
+  def get(s : String) : String = {
     var result = ""
 
     val p = Promise[String]()
@@ -67,8 +68,7 @@ object Room{
       json = jsEventsLine.drop(MAGIC_TOKEN.size).replaceAll("l\\\\","L")
     }
     {
-      import org.json4s._
-      import org.json4s.jackson.JsonMethods._
+
 
       // Parse awkward JS datetimes
       implicit val formats = new DefaultFormats {
@@ -83,13 +83,13 @@ object Room{
     for (e <- events) {
       breakable {
         // Date of this event e
-        val dateStartEvent = new DateTime(e.Start.getOrElse(null).getTime)
-        val dateEndEvent = new DateTime(e.End.getOrElse(null).getTime)
+        val dateStartEvent = new DateTime(e.Start.get.getTime)
+        val dateEndEvent = new DateTime(e.End.get.getTime)
 
         if (startDay.getDayOfYear > dateStartEvent.getDayOfYear)
           break // continue
         if (startDay.getDayOfYear < dateStartEvent.getDayOfYear && onlyToday)
-          break
+          break // continue
 
         if (printedDay.getDayOfYear < dateStartEvent.getDayOfYear) {
           printedDay = dateStartEvent
@@ -101,9 +101,9 @@ object Room{
         }
       }
 
-    p.success(if(result.length == 0) "No Course" else result)
+      p.success(if(result.length == 0) "No Course/ No information for this room" else result)
     }
-  p.future
+    Await.result(p.future, 10 second)
   }
 }
 
