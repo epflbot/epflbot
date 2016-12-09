@@ -43,7 +43,7 @@ case class Event(ResizeDisabled: Boolean,Tag: List[String],Start: Option[java.ut
                  End: Option[java.util.Date], DoubleClickDisabled: Boolean, Text: String, Recurrent: Boolean,
                  MoveDisabled: Boolean, Sort: String)
 */
-case class Event(Tag: List[String], Start: Option[java.util.Date], End: Option[java.util.Date])
+case class Event(Tag: List[String], Start: java.util.Date, End: java.util.Date)
 
 
 object Room{
@@ -53,7 +53,7 @@ object Room{
 
   def buildQuery(room: String) = s"https://ewa.epfl.ch/room/Default.aspx?room=$room"
   val MAGIC_TOKEN = "v.events = "
-  val onlyToday = true   // onlyToday = false => show all events from today to the end of the week
+  val onlyToday = true // onlyToday = false => show all events from today to the end of the week
 
   def get(s : String) : String = {
     var result = ""
@@ -83,25 +83,25 @@ object Room{
     for (e <- events) {
       breakable {
         // Date of this event e
-        val dateStartEvent = new DateTime(e.Start.get.getTime)
-        val dateEndEvent = new DateTime(e.End.get.getTime)
+        val dateStartEvent = new DateTime(e.Start.getTime)
+        val dateEndEvent = new DateTime(e.End.getTime)
 
         if (startDay.getDayOfYear > dateStartEvent.getDayOfYear)
           break // continue
-        if (startDay.getDayOfYear < dateStartEvent.getDayOfYear && onlyToday)
+        if (onlyToday & startDay.getDayOfYear < dateStartEvent.getDayOfYear)
           break // continue
 
         if (printedDay.getDayOfYear < dateStartEvent.getDayOfYear) {
           printedDay = dateStartEvent
           result += "-----------" + dateStartEvent.toDate.toString.substring(0, 10) + "-----------\n"
         }
-        result += e.Tag(0).substring(0, e.Tag(0).length - 4) + " ["
+        result += e.Tag(0).substring(0, e.Tag(0).length - 4) + "   ["
         result += dateStartEvent.toDate.toString.substring(11, 19) + "--"
         result += dateEndEvent.toDate.toString.substring(11, 19) + "]\n"
         }
       }
 
-      p.success(if(result.length == 0) "No Course/ No information for this room" else result)
+      p.success(if(result.length == 0) "No Course" else result)
     }
     Await.result(p.future, 10 second)
   }
