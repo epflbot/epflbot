@@ -109,15 +109,19 @@ case class Event(title: String,
   override def toString() = {
     val periodFmter = new PeriodFormatterBuilder().appendDays().appendSuffix(" day", " days")
                                                 .appendSeparator(" and ")
+                                                .appendHours().appendSuffix(" hour", " hours")
+                                                .appendSeparator(" and ")
                                                 .appendMinutes().appendSuffix(" minute", " minutes")
                                                 .appendSeparator(" and ")
                                                 .appendSeconds().appendSuffix(" second", " seconds")
                                                 .toFormatter()
     val dateFmter = new DateTimeFormatterBuilder().appendDayOfWeekText()
+                                                  .appendLiteral(", ")
+                                                  .appendMonthOfYearText()
                                                   .appendLiteral(' ')
                                                   .appendDayOfMonth(2)
                                                   .appendLiteral(' ')
-                                                  .appendMonthOfYearText()
+                                                  .appendYear(2, 4)
                                                   .toFormatter()
     val timeFmter = DateTimeFormat.forPattern("HH:mm")
     val remaining = (new Duration(LocalTime.now.getMillisOfDay(), endDate.toLocalTime().getMillisOfDay())).toPeriod()
@@ -128,6 +132,7 @@ case class Event(title: String,
       " (" + periodFmter.print(remaining) + " remaining) " + "\n" +
     ((location, locationUrl) match {
       case (Some(loc), Some(locUrl)) => "At: " + loc + " (" + locUrl + ")\n\n"
+      case (Some(loc), None) => "At: " + loc + "\n\n"
       case _ => ""
     }) +
     "export ICal link: " + exportUrl + "\n" +
