@@ -13,7 +13,7 @@ import akka.util.ByteString
 import ch.epfl.telegram._
 
 object InlineEpflBot extends TelegramBot with Polling with Commands with ChatActions
-  with TL with Survey with InlineEpflDirectory with Menu {
+  with TL with Survey with InlineEpflDirectory with Menu with Events {
 
   // PUT YOU TOKEN HERE
   def token = scala.io.Source.fromFile("token").getLines().next
