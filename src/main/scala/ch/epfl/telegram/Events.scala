@@ -1,6 +1,10 @@
 package ch.epfl.telegram
 
 import info.mukel.telegrambot4s.api._
+import info.mukel.telegrambot4s.models._
+import info.mukel.telegrambot4s.Implicits._
+import info.mukel.telegrambot4s.methods.EditMessageText
+
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL._
@@ -11,17 +15,41 @@ import org.joda.time.format.{PeriodFormatterBuilder, DateTimeFormatterBuilder, D
 /**
   * Add Events (EPFL Events) useful commands.
   */
-trait Events extends Commands {
-  _ : TelegramBot =>
+trait Events extends Commands { _ : TelegramBot =>
 
   /**
-    * Crude command to get today EPFL events.
+    * Crude command to get today EPFL events. (that are not "already finished")
     */
   on("/events") { implicit msg => _ =>
-    // offer way to search for events (new additional command or if no category found or ?) +
-    val events: List[Event] = EventsScraper.retrieveEvents("?", 1)
-    events.foreach(event => reply(event.toString))
+    // TODO offer way to search for events
+    Events.events = EventsScraper.retrieveEvents("?", 1)  // TODO DIRTY !!!!!!! ^^
+    // TODO check empty...
+    reply(Events.events.head.toString, replyMarkup = Events.getKeyboard(0))
+    //Events.events.foreach { event => reply(event.toString) }
   }
+
+  override def onCallbackQuery(callbackQuery: CallbackQuery): Unit = {
+    val index = callbackQuery.data.getOrElse("0").toInt
+    println(index < Events.events.length && index >= 0)
+    val msg: Message = callbackQuery.message.get  // FIXME what if None ?
+    request(
+      EditMessageText(messageId = msg.messageId,
+                      chatId = msg.chat.id,
+                      text = Events.events(index).toString,
+                      replyMarkup = Events.getKeyboard(index))
+    )
+  }
+}
+
+object Events {
+  var events: List[Event] = Nil  // WOWOWOWOW DIRTY ^^
+
+  def getKeyboard(eventIndex: Int): InlineKeyboardMarkup =
+    if (eventIndex == 0) InlineKeyboardMarkup(List(List(InlineKeyboardButton("next", callbackData = "1"))))
+    else if (eventIndex == Events.events.length - 1) InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString))))
+    else InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString),
+      InlineKeyboardButton("next", callbackData = (eventIndex+1).toString))))
+
 }
 
 object EventsScraper {
@@ -33,17 +61,19 @@ object EventsScraper {
   // (the whole design is already bad design) (lot of bloat retrieved on each user request) 
   // but don't want to change my get event code now ^^
   // FIXME if time maybe load the page with ALL events (+menu) once per day and do shit according to user input
-  lazy val menu = 
+  // Unused now
+  lazy val menu =
     browser.get(baseUrl+"?category=2") >> elementList("div.toolbar-group:nth-child(2) > "+
                                                       "div:nth-child(1) > "+
                                                        "ul:nth-child(2) > "+
                                                        "li > a")
+  // Unused now
   lazy val categories = menu.map { element =>
     val name = element >> text("a")
     val id = element >> attr("href")("a")
     name.toLowerCase -> id
   }.toMap
-
+  // Unused now
   def categoryOf(arg: String): String =
     categories.find { 
       case (name, id) => name.startsWith(arg.toLowerCase) 
@@ -107,13 +137,13 @@ case class Event(title: String,
   }
 
   override def toString() = {
-    val periodFmter = new PeriodFormatterBuilder().appendDays().appendSuffix(" day", " days")
-                                                .appendSeparator(" and ")
+    val periodFmter = new PeriodFormatterBuilder()//.appendDays().appendSuffix(" day", " days")
+                                                //.appendSeparator(" and ")
                                                 .appendHours().appendSuffix(" hour", " hours")
                                                 .appendSeparator(" and ")
                                                 .appendMinutes().appendSuffix(" minute", " minutes")
-                                                .appendSeparator(" and ")
-                                                .appendSeconds().appendSuffix(" second", " seconds")
+                                                //.appendSeparator(" and ")
+                                                //.appendSeconds().appendSuffix(" second", " seconds")
                                                 .toFormatter()
     val dateFmter = new DateTimeFormatterBuilder().appendDayOfWeekText()
                                                   .appendLiteral(", ")
@@ -141,4 +171,3 @@ case class Event(title: String,
   // override def toString() = eventDiv.toString() HTML ?...
   // TODO beautiful formatting....what does telegram allow to do ? print image of event ? why not just render the whole <div> if allowed
 }
-
