@@ -31,9 +31,9 @@ trait Survey extends Commands { _: TelegramBot =>
 
   override def onCallbackQuery(cb: CallbackQuery): Unit = {
     cb match {
-      case CallbackQuery(_, user, Some(message), _, _, Some(data), _) =>
+      case CallbackQuery(_, user, Some(message), _, _, Some(data), _) if data.startsWith(callbackPrefix) =>
         logger.debug("callback query data {}", data)
-        val Array(questionIdx, answerIdx) = data.split(":").map(_.toInt)
+        val Array(questionIdx, answerIdx) = data.replace(callbackPrefix, "").split(":").map(_.toInt)
         val (question, answer) =
           if (questionIdx < generalQuestions.size) {
             val (question, answers) = generalQuestions(questionIdx)
@@ -91,6 +91,8 @@ trait Survey extends Commands { _: TelegramBot =>
 
 object Survey {
 
+  val callbackPrefix = "survey1"
+
   val surveyStore   = "survey" / "welcome"
   val feedbackStore = "feedback" / "welcome"
 
@@ -130,7 +132,7 @@ object Survey {
         val question = s"*How likely would you use the following service through EPFLBot?*\n\u27A1 _${service}_"
         val buttons = (1 to 3).map { i =>
           val answer = List.fill(i)("\u2B50").mkString
-          InlineKeyboardButton(answer, callbackData = s"$step:$i")
+          InlineKeyboardButton(answer, callbackData = s"$callbackPrefix$step:$i")
         }
         val next = question -> InlineKeyboardMarkup(List(buttons))
         FastFuture.successful(next)
