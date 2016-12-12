@@ -14,6 +14,7 @@ scalacOptions ++= Seq(
 
 resolvers += "jitpack" at "https://jitpack.io"
 resolvers += Resolver.sonatypeRepo("releases")
+resolvers += Resolver.typesafeIvyRepo("releases")
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
@@ -28,7 +29,8 @@ libraryDependencies ++= Seq(
   "ch.qos.logback"             % "logback-classic"          % "1.1.6",
   "ch.qos.logback"             % "logback-access"           % "1.1.6",
   "net.logstash.logback"       % "logstash-logback-encoder" % "4.8",
-  "org.apache.logging.log4j"   % "log4j-to-slf4j"           % "2.7"
+  "org.apache.logging.log4j"   % "log4j-to-slf4j"           % "2.7",
+  "com.typesafe"               %% "emoji"                   % "1.0.0"
 )
 
 scalafmtConfig := Some(file(".scalafmt.conf"))

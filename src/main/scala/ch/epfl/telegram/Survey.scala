@@ -36,6 +36,8 @@ trait Survey extends Commands { _: TelegramBot =>
 
 object Survey {
 
+  val callbackPrefix = "survey"
+
   type Responses = Map[String, String]
 
   private val es = {
