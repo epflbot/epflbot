@@ -2,6 +2,8 @@ package ch.epfl.telegram
 
 import akka.http.scaladsl.util.FastFuture
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.typesafe.emoji.ShortCodes.Defaults._
+import com.typesafe.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
@@ -150,7 +152,10 @@ object Survey {
     }
   }
 
-  val introduction = "This is a quick survey to improve your EPFLBot experience :D.\n" +
+  val happy = "smiley".emoji
+  val tada  = "tada".emoji
+
+  val introduction = s"This is a quick survey to improve your EPFLBot experience $happy.\n" +
       "Answers are confidential and won't be publicly disclosed."
 
   val generalQuestions = List(
@@ -226,7 +231,7 @@ object Survey {
     "meeting new people"
   )
 
-  val conclusion = "You completed the whole survey \\o/. Thank you for your contributions!\n" +
+  val conclusion = s"You completed the whole survey $tada. Thank you for your contributions!\n" +
       "You can add your own ideas using:\n" +
       "  _/feedback I'd like to see daily menu reminder!_"
 
