@@ -1,22 +1,23 @@
+package ch.epfl.telegram
 
-import info.mukel.telegrambot4s._
-import api._
-import methods._
-import models._
-import Implicits._
 import java.net.URLEncoder
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
-import ch.epfl.telegram._
+import info.mukel.telegrambot4s.Implicits._
+import info.mukel.telegrambot4s.api._
+import info.mukel.telegrambot4s.methods._
+import info.mukel.telegrambot4s.models._
+
+import scala.io.Source
+import scala.util.Properties
 
 object InlineEpflBot extends TelegramBot with Polling with Commands with ChatActions
-  with TL with Survey with InlineEpflDirectory with Menu with Events {
+  with TL with Survey with InlineEpflDirectory with Events with Menu {
 
-  // PUT YOU TOKEN HERE
-  def token = scala.io.Source.fromFile("token").getLines().next
+  lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
 
   val ttsApiBase = "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q="
 
@@ -33,6 +34,7 @@ object InlineEpflBot extends TelegramBot with Polling with Commands with ChatAct
       request(SendVoice(msg.sender, voiceMp3))
 
       // Simple Java integration example for John.
+      reply(MyFunctions.hello())
     }
   }
 
@@ -40,6 +42,22 @@ object InlineEpflBot extends TelegramBot with Polling with Commands with ChatAct
     reply(
       "http://lmgtfy.com/?q=" + URLEncoder.encode(args mkString " ", "UTF-8"),
       disableWebPagePreview = true
+    )
+  }
+
+  on("/about") { implicit msg => _ =>
+    reply(
+      """
+        |Hey!
+        |
+        |This bot offers various EPFL-specific campus services.
+        |
+        |The project is currently part of one SHS master class and aims at:
+        |  - evaluating product creation processes
+        |  - suggest new ways to interact within the campus
+        |
+        |Ping us for feedback and suggestions!
+      """.stripMargin
     )
   }
 
