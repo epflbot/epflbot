@@ -1,17 +1,15 @@
 package ch.epfl.telegram
 
 import info.mukel.telegrambot4s.api._
+import collection.JavaConverters._
 
-import scala.collection.JavaConverters._
-
-trait Menu extends Commands { _: TelegramBot =>
+trait Menu extends Commands {
+  _ : TelegramBot =>
 
   on("/menu") { implicit msg => args =>
-    MenuHandler
-      .search(msg.text.orNull, args.asJava)
-      .asScala
-      .foreach { rep =>
-        reply(rep)
-      }
+    for( i <- 0 to MenuHandler.search(msg.text.orNull, args.asJava).size()){
+      reply(MenuHandler.search(msg.text.orNull, args.asJava).get(i));
+    }
+
   }
 }

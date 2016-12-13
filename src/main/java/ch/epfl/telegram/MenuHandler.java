@@ -1,15 +1,9 @@
 package ch.epfl.telegram;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.List;
-
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
 public class MenuHandler {
 
     public static ArrayList<String> search(String text, List<String> args) {
