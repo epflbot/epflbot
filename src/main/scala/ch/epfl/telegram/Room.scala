@@ -42,7 +42,7 @@ case class Event(ResizeDisabled: Boolean,Tag: List[String],Start: Option[java.ut
                  End: Option[java.util.Date], DoubleClickDisabled: Boolean, Text: String, Recurrent: Boolean,
                  MoveDisabled: Boolean, Sort: String)
 */
-case class Event(Tag: List[String], Start: java.util.Date, End: java.util.Date)
+case class RoomEvent(Tag: List[String], Start: java.util.Date, End: java.util.Date)
 
 
 object Room{
@@ -68,13 +68,12 @@ object Room{
     }
     {
 
-
       // Parse awkward JS datetimes
       implicit val formats = new DefaultFormats {
         override def dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
       }
 
-      val events = parse(json).extract[Array[Event]]
+      val events = parse(json).extract[Array[RoomEvent]]
 
     val startDay = new DateTime()  // Today
     var printedDay = startDay.minusDays(1)
