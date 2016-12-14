@@ -1,22 +1,23 @@
+package ch.epfl.telegram
 
-import info.mukel.telegrambot4s._
-import api._
-import methods._
-import models._
-import Implicits._
 import java.net.URLEncoder
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.util.ByteString
-import ch.epfl.telegram.{Room, Survey, TL}
+import info.mukel.telegrambot4s.Implicits._
+import info.mukel.telegrambot4s.api._
+import info.mukel.telegrambot4s.methods._
+import info.mukel.telegrambot4s.models._
 
-object EpflBot extends TelegramBot with Polling with Commands with ChatActions with TL with Survey with Room{
+import scala.io.Source
+import scala.util.Properties
 
+object InlineEpflBot extends TelegramBot with Polling with Commands with ChatActions
+  with TL with Survey with InlineEpflDirectory with Events with Menu {
 
-  // PUT YOU TOKEN HERE
-  def token = scala.io.Source.fromFile("token").getLines().next
+  lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
 
   val ttsApiBase = "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q="
 
@@ -44,8 +45,24 @@ object EpflBot extends TelegramBot with Polling with Commands with ChatActions w
     )
   }
 
+  on("/about") { implicit msg => _ =>
+    reply(
+      """
+        |Hey!
+        |
+        |This bot offers various EPFL-specific campus services.
+        |
+        |The project is currently part of one SHS master class and aims at:
+        |  - evaluating product creation processes
+        |  - suggest new ways to interact within the campus
+        |
+        |Ping us for feedback and suggestions!
+      """.stripMargin
+    )
+  }
 
   def main(args: Array[String]): Unit = {
+    //DirectoryScraper.getPersons("Sophia")
     run()
   }
 }

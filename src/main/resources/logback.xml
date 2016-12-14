@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %date{ISO8601} %-5level %-25logger{25} %+3X{user} %replace(%.-2000msg){'\\r\\n', ' '} %ex{short}%n
+            </pattern>
+        </encoder>
+    </appender>
+    <appender name="STASH" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <includeCallerData>true</includeCallerData>
+        <appender class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
+            <destination>${LOGSTASH_INTERFACE:-localhost}:5000</destination>
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp/>
+                    <version/>
+                    <stackTrace/>
+                    <callerData/>
+                    <logLevel/>
+                    <loggerName/>
+                    <pattern>
+                        <pattern>
+                            {
+                            "message": "%.-2000message",
+                            "akkaSource": "%X{akkaSource}",
+                            "akkaTimestamp": "%X{akkaTimestamp}"
+                            }
+                        </pattern>
+                    </pattern>
+                </providers>
+            </encoder>
+            <keepAliveDuration>5 minutes</keepAliveDuration>
+        </appender>
+    </appender>
+    <root level="DEBUG">
+        <appender-ref ref="${LOGSTASH_APPENDER:-STDOUT}"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+    <logger name="io.netty" level="WARN" />
+    <logger name="netty" level="WARN" />
+    <logger name="org.elasticsearch" level="INFO" />
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+</configuration>

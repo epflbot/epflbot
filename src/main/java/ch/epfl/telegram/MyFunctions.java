@@ -1,3 +1,4 @@
+package ch.epfl.telegram;
 
 public class MyFunctions {
 
