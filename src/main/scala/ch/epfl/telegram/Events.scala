@@ -28,20 +28,26 @@ trait Events extends Commands { _ : TelegramBot =>
     //Events.events.foreach { event => reply(event.toString) }
   }
 
-  override def onCallbackQuery(callbackQuery: CallbackQuery): Unit = {
-    val index = callbackQuery.data.getOrElse("0").toInt
-    println(index < Events.events.length && index >= 0)
-    val msg: Message = callbackQuery.message.get  // FIXME what if None ?
-    request(
-      EditMessageText(messageId = msg.messageId,
-                      chatId = msg.chat.id,
-                      text = Events.events(index).toString,
-                      replyMarkup = Events.getKeyboard(index))
-    )
+  override def onCallbackQuery(cb: CallbackQuery): Unit = cb match {
+    case CallbackQuery(_, _, Some(message), _, _, Some(data), _) if data.startsWith(Events.callbackPrefix) =>
+      logger.debug("callback query data {}", data)
+      val index = data.toInt
+      println(index < Events.events.length && index >= 0)
+      request(
+        EditMessageText(messageId = message.messageId,
+                        chatId = message.chat.id,
+                        text = Events.events(index).toString,
+                        replyMarkup = Events.getKeyboard(index))
+      )
+
+    case _ =>
+      super.onCallbackQuery(cb)
   }
 }
 
+
 object Events {
+  val callbackPrefix = "events"
   var events: List[Event] = Nil  // WOWOWOWOW DIRTY ^^
 
   def getKeyboard(eventIndex: Int): InlineKeyboardMarkup =
