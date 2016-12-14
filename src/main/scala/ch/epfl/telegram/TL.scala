@@ -9,8 +9,7 @@ import org.joda.time.DateTime
 /**
   * Add TL (transport public Lausanne) useful commands.
   */
-trait TL extends Commands {
-  _ : TelegramBot =>
+trait TL extends Commands { _: TelegramBot =>
 
   /**
     * Crude command to get next next M1 departures, from EPFL, direction Flon.
@@ -29,7 +28,7 @@ object TLScraper {
   val baseUrl = "http://www.t-l.ch/tl-live-mobile/"
 
   def getLines() = {
-    val doc = browser.get(baseUrl + "index.php")
+    val doc   = browser.get(baseUrl + "index.php")
     val lines = doc >> element("#page_horaire > div:nth-child(2) > ul") >> elements("> li > a")
     lines map (_.attr("href"))
   }
@@ -40,8 +39,10 @@ object TLScraper {
     */
   def horaires_M1_EPFL_Flon() = {
     val now = DateTime.now
-    val timeParams = s"""jour=${now.getYear}%2F${now.getMonthOfYear}%2F${now.getDayOfMonth}&heure=${now.getHourOfDay}&minute=${now.getMinuteOfHour}"""
-    val doc = browser.get(baseUrl + "line_detail.php?id=3377704015495518&line=11821953316814882&id_direction=11821953316814882&id_stop=2533279085551931&" + timeParams)
+    val timeParams =
+      s"""jour=${now.getYear}%2F${now.getMonthOfYear}%2F${now.getDayOfMonth}&heure=${now.getHourOfDay}&minute=${now.getMinuteOfHour}"""
+    val doc = browser.get(
+      baseUrl + "line_detail.php?id=3377704015495518&line=11821953316814882&id_direction=11821953316814882&id_stop=2533279085551931&" + timeParams)
     val lines = doc >> element("#lineDetailPage > div:nth-child(4) > div > ul") >> elements("> li > .time")
     lines map (_.text)
   }

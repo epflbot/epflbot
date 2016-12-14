@@ -14,8 +14,17 @@ import info.mukel.telegrambot4s.models._
 import scala.io.Source
 import scala.util.Properties
 
-object InlineEpflBot extends TelegramBot with Polling with Commands with ChatActions
-  with TL with Survey with InlineEpflDirectory with Events with Menu with Room {
+object InlineEpflBot
+    extends TelegramBot
+    with Polling
+    with Commands
+    with ChatActions
+    with TL
+    with Survey
+    with InlineEpflDirectory
+    with Events
+    with Menu
+    with Room {
 
   lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
 
@@ -23,11 +32,11 @@ object InlineEpflBot extends TelegramBot with Polling with Commands with ChatAct
 
   on("/speak") { implicit msg => args =>
     val text = args mkString " "
-    val url = ttsApiBase + URLEncoder.encode(text, "UTF-8")
+    val url  = ttsApiBase + URLEncoder.encode(text, "UTF-8")
     for {
       response <- Http().singleRequest(HttpRequest(uri = Uri(url)))
       if response.status.isSuccess()
-      bytes <-  Unmarshal(response).to[ByteString]
+      bytes <- Unmarshal(response).to[ByteString]
     } /* do */ {
       uploadingAudio // hint the user
       val voiceMp3 = InputFile.FromByteString("voice.mp3", bytes)

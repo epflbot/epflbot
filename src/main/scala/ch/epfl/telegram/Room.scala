@@ -27,11 +27,10 @@ import org.json4s.jackson.JsonMethods._
   * Source original = "https://ewa.epfl.ch/room/Default.aspx?room=bc01"
   * Still not deal with  wrong argument....
   */
-trait Room extends Commands {
-  _ : TelegramBot =>
+trait Room extends Commands { _: TelegramBot =>
 
   on("/room") { implicit msg => args =>
-    val responses =  Room.get(URLEncoder.encode(args mkString " ", "UTF-8"))
+    val responses = Room.get(URLEncoder.encode(args mkString " ", "UTF-8"))
     reply(responses)
   }
 }
@@ -41,20 +40,19 @@ case class Event(ResizeDisabled: Boolean,Tag: List[String],Start: Option[java.ut
                  BackColor : String, RecurrentMasterId: String, DeleteDisabled: Boolean,
                  End: Option[java.util.Date], DoubleClickDisabled: Boolean, Text: String, Recurrent: Boolean,
                  MoveDisabled: Boolean, Sort: String)
-*/
+ */
 case class RoomEvent(Tag: List[String], Start: java.util.Date, End: java.util.Date)
 
-
-object Room{
-  implicit val system = ActorSystem()
+object Room {
+  implicit val system       = ActorSystem()
   implicit val materializer = ActorMaterializer()
-  implicit val ec = system.dispatcher
+  implicit val ec           = system.dispatcher
 
   def buildQuery(room: String) = s"https://ewa.epfl.ch/room/Default.aspx?room=$room"
-  val MAGIC_TOKEN = "v.events = "
-  val onlyToday = true // onlyToday = false => show all events from today to the end of the week
+  val MAGIC_TOKEN              = "v.events = "
+  val onlyToday                = true // onlyToday = false => show all events from today to the end of the week
 
-  def get(s : String) : String = {
+  def get(s: String): String = {
     var result = ""
 
     val p = Promise[String]()
@@ -62,7 +60,7 @@ object Room{
     for {
       response <- Http().singleRequest(HttpRequest(uri = Uri(buildQuery(s))))
       if response.status.isSuccess()
-      html <- Unmarshal(response.entity).to[String]
+      html         <- Unmarshal(response.entity).to[String]
       jsEventsLine <- html.split("\n").find(_.startsWith(MAGIC_TOKEN))
       json = jsEventsLine.drop(MAGIC_TOKEN.size).replaceAll("l\\\\", "L")
     } {
@@ -74,14 +72,14 @@ object Room{
 
       val events = parse(json).extract[Array[RoomEvent]]
 
-      val startDay = new DateTime() // Today
+      val startDay   = new DateTime() // Today
       var printedDay = startDay.minusDays(1)
 
       for (e <- events) {
         breakable {
           // Date of this event e
           val dateStartEvent = new DateTime(e.Start.getTime)
-          val dateEndEvent = new DateTime(e.End.getTime)
+          val dateEndEvent   = new DateTime(e.End.getTime)
 
           if (startDay.getDayOfYear > dateStartEvent.getDayOfYear)
             break // continue
@@ -103,8 +101,7 @@ object Room{
     try {
       Await.result(p.future, 5 second)
     } catch {
-      case  _ :Exception => "This room is not available"
+      case _: Exception => "This room is not available"
     }
   }
 }
-

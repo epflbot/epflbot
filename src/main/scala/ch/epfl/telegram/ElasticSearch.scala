@@ -10,9 +10,9 @@ object ElasticSearch {
 
   private val es = {
     val interface = Properties.envOrElse("ELASTICSEARCH_INTERFACE", "0.0.0.0")
-    val settings = Settings.builder().put("cluster.name", "epflbot").build()
-    val uri      = s"elasticsearch://$interface:9300"
-    val client   = ElasticClient.transport(settings, ElasticsearchClientUri(uri))
+    val settings  = Settings.builder().put("cluster.name", "epflbot").build()
+    val uri       = s"elasticsearch://$interface:9300"
+    val client    = ElasticClient.transport(settings, ElasticsearchClientUri(uri))
     client
   }
 

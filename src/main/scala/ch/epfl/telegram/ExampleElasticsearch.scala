@@ -91,7 +91,7 @@ object ExampleElasticsearch /*extends App*/ {
   val first = wait {
     ElasticSearch {
       search(students)
-    } map(_.to[User])
+    } map (_.to[User])
   }
 
   println(first) // should show nothing
@@ -101,7 +101,7 @@ object ExampleElasticsearch /*extends App*/ {
   val second = wait {
     ElasticSearch {
       search(students)
-    } map(_.to[User])
+    } map (_.to[User])
   }
 
   println(second) // Vector(User(hey,Place(here,42)), User(moris,Place(here,42)))
