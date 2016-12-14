@@ -25,14 +25,13 @@ trait Events extends Commands { _ : TelegramBot =>
     Events.events = EventsScraper.retrieveEvents("?", 1)  // TODO DIRTY !!!!!!! ^^
     // TODO check empty...
     reply(Events.events.head.toString, replyMarkup = Events.getKeyboard(0))
-    //Events.events.foreach { event => reply(event.toString) }
   }
 
   override def onCallbackQuery(cb: CallbackQuery): Unit = cb match {
     case CallbackQuery(_, _, Some(message), _, _, Some(data), _) if data.startsWith(Events.callbackPrefix) =>
       logger.debug("callback query data {}", data)
-      val index = data.toInt
-      println(index < Events.events.length && index >= 0)
+      val index = data.replace(Events.callbackPrefix, "").toInt
+      println(index)
       request(
         EditMessageText(messageId = message.messageId,
                         chatId = message.chat.id,
@@ -41,6 +40,7 @@ trait Events extends Commands { _ : TelegramBot =>
       )
 
     case _ =>
+      println("default super")
       super.onCallbackQuery(cb)
   }
 }
@@ -51,39 +51,18 @@ object Events {
   var events: List[Event] = Nil  // WOWOWOWOW DIRTY ^^
 
   def getKeyboard(eventIndex: Int): InlineKeyboardMarkup =
-    if (eventIndex == 0) InlineKeyboardMarkup(List(List(InlineKeyboardButton("next", callbackData = "1"))))
-    else if (eventIndex == Events.events.length - 1) InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString))))
-    else InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString),
-      InlineKeyboardButton("next", callbackData = (eventIndex+1).toString))))
-
+    InlineKeyboardMarkup(List(
+      if (events.length == 1) Nil
+      else if (eventIndex == 0) List(InlineKeyboardButton("next", callbackData = callbackPrefix + "1"))
+      else if (eventIndex == events.length - 1) List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (eventIndex-1)))
+      else List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (eventIndex-1)),
+                InlineKeyboardButton("next", callbackData = callbackPrefix + (eventIndex+1)))
+    ))
 }
 
 object EventsScraper {
   val browser = JsoupBrowser()
   val baseUrl = "http://memento.epfl.ch/"
-
-  // category=2 => Management Board meetings => no public events
-  // dirty way to avoid loading a page full of events just to get the menu
-  // (the whole design is already bad design) (lot of bloat retrieved on each user request) 
-  // but don't want to change my get event code now ^^
-  // FIXME if time maybe load the page with ALL events (+menu) once per day and do shit according to user input
-  // Unused now
-  lazy val menu =
-    browser.get(baseUrl+"?category=2") >> elementList("div.toolbar-group:nth-child(2) > "+
-                                                      "div:nth-child(1) > "+
-                                                       "ul:nth-child(2) > "+
-                                                       "li > a")
-  // Unused now
-  lazy val categories = menu.map { element =>
-    val name = element >> text("a")
-    val id = element >> attr("href")("a")
-    name.toLowerCase -> id
-  }.toMap
-  // Unused now
-  def categoryOf(arg: String): String =
-    categories.find { 
-      case (name, id) => name.startsWith(arg.toLowerCase) 
-    }.getOrElse(("all..." -> "?"))._2
 
   def parseEvent(eventDiv: Element): Event = {
     // Title, URL
