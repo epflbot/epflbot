@@ -64,9 +64,8 @@ object Room{
       if response.status.isSuccess()
       html <- Unmarshal(response.entity).to[String]
       jsEventsLine <- html.split("\n").find(_.startsWith(MAGIC_TOKEN))
-      json = jsEventsLine.drop(MAGIC_TOKEN.size).replaceAll("l\\\\","L")
-    }
-    {
+      json = jsEventsLine.drop(MAGIC_TOKEN.size).replaceAll("l\\\\", "L")
+    } {
 
       // Parse awkward JS datetimes
       implicit val formats = new DefaultFormats {
@@ -75,33 +74,37 @@ object Room{
 
       val events = parse(json).extract[Array[RoomEvent]]
 
-    val startDay = new DateTime()  // Today
-    var printedDay = startDay.minusDays(1)
+      val startDay = new DateTime() // Today
+      var printedDay = startDay.minusDays(1)
 
-    for (e <- events) {
-      breakable {
-        // Date of this event e
-        val dateStartEvent = new DateTime(e.Start.getTime)
-        val dateEndEvent = new DateTime(e.End.getTime)
+      for (e <- events) {
+        breakable {
+          // Date of this event e
+          val dateStartEvent = new DateTime(e.Start.getTime)
+          val dateEndEvent = new DateTime(e.End.getTime)
 
-        if (startDay.getDayOfYear > dateStartEvent.getDayOfYear)
-          break // continue
-        if (onlyToday & startDay.getDayOfYear < dateStartEvent.getDayOfYear)
-          break // continue
+          if (startDay.getDayOfYear > dateStartEvent.getDayOfYear)
+            break // continue
+          if (onlyToday & startDay.getDayOfYear < dateStartEvent.getDayOfYear)
+            break // continue
 
-        if (printedDay.getDayOfYear < dateStartEvent.getDayOfYear) {
-          printedDay = dateStartEvent
-          result += "-----------" + dateStartEvent.toDate.toString.substring(0, 10) + "-----------\n"
-        }
-        result += e.Tag(0).substring(0, e.Tag(0).length - 4) + "   ["
-        result += dateStartEvent.toDate.toString.substring(11, 19) + "--"
-        result += dateEndEvent.toDate.toString.substring(11, 19) + "]\n"
+          if (printedDay.getDayOfYear < dateStartEvent.getDayOfYear) {
+            printedDay = dateStartEvent
+            result += "-----------" + dateStartEvent.toDate.toString.substring(0, 10) + "-----------\n"
+          }
+          result += e.Tag(0).substring(0, e.Tag(0).length - 4) + "   ["
+          result += dateStartEvent.toDate.toString.substring(11, 19) + "--"
+          result += dateEndEvent.toDate.toString.substring(11, 19) + "]\n"
         }
       }
 
-      p.success(if(result.length == 0) "No Course" else result)
+      p.success(if (result.length == 0) "No Course/No information for this room" else result)
     }
-    Await.result(p.future, 5 second)
+    try {
+      Await.result(p.future, 5 second)
+    } catch {
+      case  _ :Exception => "This room is not available"
+    }
   }
 }
 
