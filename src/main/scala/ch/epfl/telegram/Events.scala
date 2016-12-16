@@ -3,14 +3,13 @@ package ch.epfl.telegram
 import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.models._
 import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.methods.EditMessageText
-
+import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.model.Element
-import org.joda.time.{DateTime, LocalDate, LocalTime, Period, Duration}
-import org.joda.time.format.{PeriodFormatterBuilder, DateTimeFormatterBuilder, DateTimeFormat}
+import org.joda.time.{DateTime, Duration, LocalDate, LocalTime, Period}
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatterBuilder, PeriodFormatterBuilder}
 
 /**
   * Add Events (EPFL Events) useful commands.
@@ -23,61 +22,78 @@ trait Events extends Commands { _ : TelegramBot =>
   on("/events") { implicit msg => _ =>
     // TODO offer way to search for events
     Events.events = EventsScraper.retrieveEvents("?", 1)  // TODO DIRTY !!!!!!! ^^
-    // TODO check empty...
-    reply(Events.events.head.toString, replyMarkup = Events.getKeyboard(0))
-    //Events.events.foreach { event => reply(event.toString) }
+    Events.events match {
+      case event::_ => reply(
+        event.toString(),
+        replyMarkup = Events.getKeyboard(0),
+        parseMode = ParseMode.Markdown
+      )
+      case _ => reply("nothing to show")
+    }
+
   }
 
-  override def onCallbackQuery(callbackQuery: CallbackQuery): Unit = {
-    val index = callbackQuery.data.getOrElse("0").toInt
-    println(index < Events.events.length && index >= 0)
-    val msg: Message = callbackQuery.message.get  // FIXME what if None ?
-    request(
-      EditMessageText(messageId = msg.messageId,
-                      chatId = msg.chat.id,
-                      text = Events.events(index).toString,
-                      replyMarkup = Events.getKeyboard(index))
-    )
+  override def onCallbackQuery(cb: CallbackQuery): Unit = cb match {
+    case CallbackQuery(_, _, Some(message), _, _, Some(data), _) if data.startsWith(Events.callbackPrefix) =>
+      logger.debug("callback query data {}", data)
+
+      data.replace(Events.callbackPrefix, "").toInt match {
+        case -1 => request (
+          EditMessageText (
+            messageId = message.messageId,
+            chatId = message.chat.id,
+            text = message.text.getOrElse("nothing to show"),  // TODO keep formatting
+            parseMode = ParseMode.Markdown
+          )
+        )
+        case index => request (
+          EditMessageText (
+            messageId = message.messageId,
+            chatId = message.chat.id,
+            text = Events.events(index).toString,
+            replyMarkup = Events.getKeyboard(index),
+            parseMode = ParseMode.Markdown
+          )
+        )
+      }
+
+      /*val (msgText, keyboard) = data.replace(Events.callbackPrefix, "").toInt match {
+        case -1 => (message.text.getOrElse("nothing to show"), None)
+        case index => (Events.events(index).toString, Some(Events.getKeyboard(index)))
+      }
+      EditMessageText (
+        messageId = message.messageId,
+        chatId = message.chat.id,
+        text = msgText,
+        replyMarkup = keyboard,
+        parseMode = ParseMode.Markdown
+      )*/ // TODO why does not work this way ?
+
+    case _ =>
+      super.onCallbackQuery(cb)
   }
 }
 
+
 object Events {
+  val callbackPrefix = "events1"
   var events: List[Event] = Nil  // WOWOWOWOW DIRTY ^^
 
   def getKeyboard(eventIndex: Int): InlineKeyboardMarkup =
-    if (eventIndex == 0) InlineKeyboardMarkup(List(List(InlineKeyboardButton("next", callbackData = "1"))))
-    else if (eventIndex == Events.events.length - 1) InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString))))
-    else InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString),
-      InlineKeyboardButton("next", callbackData = (eventIndex+1).toString))))
-
+    InlineKeyboardMarkup(List((
+          if (events.length == 1) Nil
+          else if (eventIndex == 0) List(InlineKeyboardButton("next", callbackData = callbackPrefix + "1"))
+          else if (eventIndex == events.length - 1) List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (eventIndex-1)))
+          else List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (eventIndex-1)),
+                    InlineKeyboardButton("next", callbackData = callbackPrefix + (eventIndex+1)))
+        ):+ InlineKeyboardButton("close", callbackData = callbackPrefix + "-1")
+      )
+    )
 }
 
 object EventsScraper {
   val browser = JsoupBrowser()
   val baseUrl = "http://memento.epfl.ch/"
-
-  // category=2 => Management Board meetings => no public events
-  // dirty way to avoid loading a page full of events just to get the menu
-  // (the whole design is already bad design) (lot of bloat retrieved on each user request) 
-  // but don't want to change my get event code now ^^
-  // FIXME if time maybe load the page with ALL events (+menu) once per day and do shit according to user input
-  // Unused now
-  lazy val menu =
-    browser.get(baseUrl+"?category=2") >> elementList("div.toolbar-group:nth-child(2) > "+
-                                                      "div:nth-child(1) > "+
-                                                       "ul:nth-child(2) > "+
-                                                       "li > a")
-  // Unused now
-  lazy val categories = menu.map { element =>
-    val name = element >> text("a")
-    val id = element >> attr("href")("a")
-    name.toLowerCase -> id
-  }.toMap
-  // Unused now
-  def categoryOf(arg: String): String =
-    categories.find { 
-      case (name, id) => name.startsWith(arg.toLowerCase) 
-    }.getOrElse(("all..." -> "?"))._2
 
   def parseEvent(eventDiv: Element): Event = {
     // Title, URL
@@ -112,8 +128,10 @@ object EventsScraper {
   
   def retrieveEvents(category: String, period: Int): List[Event] = {
     val doc = browser.get(baseUrl + category + "&period=" + period)
-    val eventDivs = doc >> elementList(".media.event")
-    eventDivs.map(parseEvent(_)).filter(_.isValidToShow())
+    doc >?> elementList(".media.event")  match {
+      case Some(eventDivs) => eventDivs.map(parseEvent(_)).filter(_.isValidToShow())
+      case None => Nil
+    }
   }
 }
 
@@ -156,17 +174,17 @@ case class Event(title: String,
     val timeFmter = DateTimeFormat.forPattern("HH:mm")
     val remaining = (new Duration(LocalTime.now.getMillisOfDay(), endDate.toLocalTime().getMillisOfDay())).toPeriod()
 
-    title + "\n\n" +
-    dateFmter.print(startDate.toLocalDate()) + " -to- " + dateFmter.print(endDate.toLocalDate()) + "\n" +
-    "From: " + timeFmter.print(startDate.toLocalTime()) + " Until: " + timeFmter.print(endDate.toLocalTime()) +
-      " (" + periodFmter.print(remaining) + " remaining) " + "\n" +
+    "*"+title + "*\n\n" +
+    dateFmter.print(startDate.toLocalDate()) + " _-to-_ " + dateFmter.print(endDate.toLocalDate()) + "\n" +
+    "*From*: *" + timeFmter.print(startDate.toLocalTime()) + "* *Until*: *" + timeFmter.print(endDate.toLocalTime()) +
+      "* (_" + periodFmter.print(remaining) + " remaining_) " + "\n" +
     ((location, locationUrl) match {
-      case (Some(loc), Some(locUrl)) => "At: " + loc + " (" + locUrl + ")\n\n"
-      case (Some(loc), None) => "At: " + loc + "\n\n"
+      case (Some(loc), Some(locUrl)) => "*At*: [" + loc + "](" + locUrl + ")\n\n"
+      case (Some(loc), None) => "*At*: " + loc + "\n\n"
       case _ => ""
     }) +
-    "export ICal link: " + exportUrl + "\n" +
-    "description: " + url
+    "[export ICal link](" + exportUrl + ")\n" +
+    "[description](" + url +")"
   }
   // override def toString() = eventDiv.toString() HTML ?...
   // TODO beautiful formatting....what does telegram allow to do ? print image of event ? why not just render the whole <div> if allowed
