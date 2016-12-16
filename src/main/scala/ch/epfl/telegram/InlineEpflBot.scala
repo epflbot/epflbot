@@ -30,7 +30,7 @@ object InlineEpflBot extends TelegramBot with Polling with Commands with ChatAct
       bytes <-  Unmarshal(response).to[ByteString]
     } /* do */ {
       uploadingAudio // hint the user
-      val voiceMp3 = InputFile.FromByteString("voice.mp3", bytes)
+      val voiceMp3 = InputFile("voice.mp3", bytes)
       request(SendVoice(msg.sender, voiceMp3))
 
       // Simple Java integration example for John.

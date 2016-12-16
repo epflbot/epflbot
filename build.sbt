@@ -12,14 +12,14 @@ scalacOptions ++= Seq(
   "-Xlint:_"
 )
 
-resolvers += "jitpack" at "https://jitpack.io"
 resolvers += Resolver.sonatypeRepo("releases")
+resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += Resolver.typesafeIvyRepo("releases")
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 libraryDependencies ++= Seq(
-  "com.github.mukel"           %% "telegrambot4s"           % "v2.0.1" exclude ("ch.qos.logback", "logback-classic"),
+  "info.mukel"                 %% "telegrambot4s"           % "2.1.0-SNAPSHOT" exclude ("ch.qos.logback", "logback-classic"),
   "net.ruippeixotog"           %% "scala-scraper"           % "1.2.0",
   "com.github.nscala-time"     %% "nscala-time"             % "2.14.0",
   "com.sksamuel.elastic4s"     %% "elastic4s-core"          % "5.0.4",
