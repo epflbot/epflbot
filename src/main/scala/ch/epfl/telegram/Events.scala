@@ -15,7 +15,9 @@ import org.joda.time.format.{PeriodFormatterBuilder, DateTimeFormatterBuilder, D
 /**
   * Add Events (EPFL Events) useful commands.
   */
-trait Events extends Commands { _ : TelegramBot =>
+trait Events extends Commands with Callbacks { _ : TelegramBot =>
+
+  import Events.EventsTag
 
   /**
     * Crude command to get today EPFL events. (that are not "already finished")
@@ -28,8 +30,8 @@ trait Events extends Commands { _ : TelegramBot =>
     //Events.events.foreach { event => reply(event.toString) }
   }
 
-  override def onCallbackQuery(callbackQuery: CallbackQuery): Unit = {
-    val index = callbackQuery.data.getOrElse("0").toInt
+  onCallbackWithTag(EventsTag) { callbackQuery =>
+    val index = callbackQuery.data.map(_.stripPrefix(EventsTag)).getOrElse("0").toInt
     println(index < Events.events.length && index >= 0)
     val msg: Message = callbackQuery.message.get  // FIXME what if None ?
     request(
@@ -44,10 +46,12 @@ trait Events extends Commands { _ : TelegramBot =>
 object Events {
   var events: List[Event] = Nil  // WOWOWOWOW DIRTY ^^
 
+  val EventsTag = "EVENTS_TAG"
+
   def getKeyboard(eventIndex: Int): InlineKeyboardMarkup =
     if (eventIndex == 0) InlineKeyboardMarkup(List(List(InlineKeyboardButton("next", callbackData = "1"))))
-    else if (eventIndex == Events.events.length - 1) InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString))))
-    else InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = (eventIndex-1).toString),
+    else if (eventIndex == Events.events.length - 1) InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = EventsTag + (eventIndex-1).toString))))
+    else InlineKeyboardMarkup(List(List(InlineKeyboardButton("prev", callbackData = EventsTag + (eventIndex-1).toString),
       InlineKeyboardButton("next", callbackData = (eventIndex+1).toString))))
 
 }
