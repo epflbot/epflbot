@@ -14,7 +14,9 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatterBuilder, PeriodFor
 /**
   * Add Events (EPFL Events) useful commands.
   */
-trait Events extends Commands { _ : TelegramBot =>
+trait Events extends Commands with Callbacks { _ : TelegramBot =>
+
+  import Events.callbackPrefix
 
   /**
     * Crude command to get today EPFL events. (that are not "already finished")
@@ -33,11 +35,11 @@ trait Events extends Commands { _ : TelegramBot =>
 
   }
 
-  override def onCallbackQuery(cb: CallbackQuery): Unit = cb match {
-    case CallbackQuery(_, _, Some(message), _, _, Some(data), _) if data.startsWith(Events.callbackPrefix) =>
+  onCallbackWithTag(callbackPrefix) {
+    case CallbackQuery(_, _, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
 
-      data.replace(Events.callbackPrefix, "").toInt match {
+      data.stripPrefix(callbackPrefix).toInt match {
         case -1 => request (
           EditMessageText (
             messageId = message.messageId,
@@ -70,7 +72,6 @@ trait Events extends Commands { _ : TelegramBot =>
       )*/ // TODO why does not work this way ?
 
     case _ =>
-      super.onCallbackQuery(cb)
   }
 }
 

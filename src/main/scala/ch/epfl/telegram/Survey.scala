@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.typesafe.emoji.ShortCodes.Defaults._
 import com.typesafe.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
+import info.mukel.telegrambot4s.api.{Callbacks, Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
 import info.mukel.telegrambot4s.models._
 
@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * /survey
   * /feedback
   */
-trait Survey extends Commands { _: TelegramBot =>
+trait Survey extends Commands with Callbacks { _: TelegramBot =>
 
   import Survey._
 
@@ -31,36 +31,32 @@ trait Survey extends Commands { _: TelegramBot =>
       )
     )
 
-  override def onCallbackQuery(cb: CallbackQuery): Unit = {
-    cb match {
-      case CallbackQuery(_, user, Some(message), _, _, Some(data), _) if data.startsWith(callbackPrefix) =>
-        logger.debug("callback query data {}", data)
-        val Array(questionIdx, answerIdx) = data.replace(callbackPrefix, "").split(":").map(_.toInt)
-        val (question, answer) =
-          if (questionIdx < generalQuestions.size) {
-            val (question, answers) = generalQuestions(questionIdx)
-            question -> answers(answerIdx)
-          } else {
-            val question = servicesQuestions(questionIdx - generalQuestions.size)
-            question -> answerIdx.toString
-          }
-
-        for {
-          _    <- putAnswer(user.id, Map(question -> answer))
-          next <- nextQuestion(user.id, Some(questionIdx + 1))
-        } {
-          next match {
-            case Some((text, markup)) =>
-              logger.info("user {} question {} markup {}", user.id.toString, question, markup.toString)
-              editMessage(message, text, markup)
-            case None =>
-              editMessage(message, conclusion)
-          }
+  onCallbackWithTag(callbackPrefix) {
+    case CallbackQuery(_, user, Some(message), _, _, Some(data), _) =>
+      logger.debug("callback query data {}", data)
+      val Array(questionIdx, answerIdx) = data.stripPrefix(callbackPrefix).split(":").map(_.toInt)
+      val (question, answer) =
+        if (questionIdx < generalQuestions.size) {
+          val (question, answers) = generalQuestions(questionIdx)
+          question -> answers(answerIdx)
+        } else {
+          val question = servicesQuestions(questionIdx - generalQuestions.size)
+          question -> answerIdx.toString
         }
 
-      case _ =>
-        super.onCallbackQuery(cb)
-    }
+      for {
+        _    <- putAnswer(user.id, Map(question -> answer))
+        next <- nextQuestion(user.id, Some(questionIdx + 1))
+      } {
+        next match {
+          case Some((text, markup)) =>
+            logger.info("user {} question {} markup {}", user.id.toString, question, markup.toString)
+            editMessage(message, text, markup)
+          case None =>
+            editMessage(message, conclusion)
+        }
+      }
+    case _ =>
   }
 
   on("/survey") { implicit msg => _ =>
