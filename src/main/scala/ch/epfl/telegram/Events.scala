@@ -36,7 +36,7 @@ trait Events extends Commands with Callbacks { _ : TelegramBot =>
   }
 
   onCallbackWithTag(callbackPrefix) {
-    case CallbackQuery(_, _, Some(message), _, _, Some(data), _) =>
+    case clb @ CallbackQuery(_, _, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
 
       data.stripPrefix(callbackPrefix).toInt match {
@@ -70,6 +70,7 @@ trait Events extends Commands with Callbacks { _ : TelegramBot =>
         replyMarkup = keyboard,
         parseMode = ParseMode.Markdown
       )*/ // TODO why does not work this way ?
+      ackCallback()(clb)
 
     case _ =>
   }
