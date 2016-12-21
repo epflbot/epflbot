@@ -1,6 +1,7 @@
 package ch.epfl.telegram
 
 import info.mukel.telegrambot4s.api._
+import info.mukel.telegrambot4s.methods.ParseMode
 
 import scala.io.Source
 import scala.util.Properties
@@ -9,21 +10,29 @@ object InlineEpflBot extends App with TelegramBot with Polling with Commands wit
   with TL with Survey with InlineEpflDirectory with Events with Menu with Room {
 
   lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
+  val version = "0.1.0"
 
-  on("/about") { implicit msg => _ =>
+  on("/start") { implicit msg => _ =>
     reply(
       """
-        |Hey!
+        |Welcome!
         |
-        |This bot offers various EPFL-specific campus services.
+        |This bot offers various EPFL-specific campus services to students and collaborators. It aims at providing interactive and social commands. Invite @EPFLBot into your favorite groups!
         |
-        |The project is currently part of one SHS master class and aims at:
-        |  - evaluating product creation processes
-        |  - suggest new ways to interact within the campus
+        |You can use /help at any moment to list available commands, for instance:
+        |  - /metro
+        |  - /feedback _I wish there was "meme" command!_
+        |
+        |Please take 2 minutes answering our /survey.
         |
         |Ping us for feedback and suggestions!
-      """.stripMargin
+      """.stripMargin,
+      parseMode = Some(ParseMode.Markdown)
     )
+  }
+
+  on("/version") { implicit msg => _ =>
+    reply(s"EPFLBot v$version.")
   }
 
   run()
