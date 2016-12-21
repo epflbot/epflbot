@@ -32,7 +32,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
     )
 
   onCallbackWithTag(callbackPrefix) {
-    case CallbackQuery(_, user, Some(message), _, _, Some(data), _) =>
+    case clb @ CallbackQuery(_, user, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
       val Array(questionIdx, answerIdx) = data.stripPrefix(callbackPrefix).split(":").map(_.toInt)
       val (question, answer) =
@@ -56,6 +56,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
             editMessage(message, conclusion)
         }
       }
+      ackCallback()(clb)
     case _ =>
   }
 
@@ -120,7 +121,7 @@ object Survey {
         val (question, answers) = generalQuestions(step)
         val buttons = answers.zipWithIndex.map {
           case (answer, i) =>
-            InlineKeyboardButton(answer, callbackData = s"$step:$i")
+            InlineKeyboardButton(answer, callbackData = s"$callbackPrefix$step:$i")
         }.toList
         val next = s"*$question*" -> InlineKeyboardMarkup(buttons.grouped(2).toList)
         FastFuture.successful(next)
@@ -229,6 +230,6 @@ object Survey {
 
   val conclusion = s"You completed the whole survey $tada. Thank you for your contributions!\n" +
       "You can add your own ideas using:\n" +
-      "  _/feedback I'd like to see daily menu reminder!_"
+      "  /feedback _I'd like to see daily menu reminder!_"
 
 }
