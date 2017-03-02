@@ -94,10 +94,10 @@ object Events {
 }
 
 object EventsScraper {
-  val browser = JsoupBrowser()
-  val baseUrl = "http://memento.epfl.ch/"
+  private val browser = JsoupBrowser()
+  private val baseUrl = "http://memento.epfl.ch/"
 
-  def parseEvent(eventDiv: Element): Event = {
+  private def parseEvent(eventDiv: Element): Event = {
     // Title, URL
     val titleElem = eventDiv >> element("h2 a")
     val title = titleElem >> attr("title")("a")
