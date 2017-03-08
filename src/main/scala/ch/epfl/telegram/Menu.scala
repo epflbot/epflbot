@@ -14,17 +14,22 @@ import net.ruippeixotog.scalascraper.model.Element
   */
 trait Menus extends Commands with Callbacks { _ : TelegramBot =>
 
-  import Menus.callbackPrefix
+  import Restos.callbackPrefix
 
   /**
-    * Crude command to get today EPFL events. (that are not "already finished")
+    * Crude command to get today EPFL menus. (that are not "already finished")
     */
   on("/menus") { implicit msg => _ =>
-    Menus.menus =  MenusScraper.retrieveMenus()  // TODO DIRTY !!!!!!! ^^
-    Menus.menus match {
-      case event::_ => reply(
-        event.toString(),
-        replyMarkup = Menus.getKeyboard(0),
+
+    val restos = MenusScraper.retrieveMenus().groupBy(_.resto) map {
+      case (name, menus) => Resto(name, menus)
+    }
+
+    Restos.setCached(restos.toList)
+    Restos.cached.get match {
+      case menu::_ => reply(
+        menu.toString(),
+        replyMarkup = Restos.getKeyboard(0),
         parseMode = ParseMode.Markdown
       )
       case _ => reply("nothing to show")
@@ -49,8 +54,8 @@ trait Menus extends Commands with Callbacks { _ : TelegramBot =>
           EditMessageText (
             messageId = message.messageId,
             chatId = message.chat.id,
-            text = Menus.menus(index).toString,
-            replyMarkup = Menus.getKeyboard(index),
+            text = Restos.cached.get(index).toString,
+            replyMarkup = Restos.getKeyboard(index),
             parseMode = ParseMode.Markdown
           )
         )
@@ -60,17 +65,28 @@ trait Menus extends Commands with Callbacks { _ : TelegramBot =>
   }
 }
 
-object Menus {
-  val callbackPrefix = "menus1"
-  var menus: List[Menu] = Nil  // WOWOWOWOW DIRTY ^^
+trait Cachable[T] {
 
-  def getKeyboard(menuIndex: Int): InlineKeyboardMarkup =
+  private var obj = Option.empty[T]
+
+  def setCached(obj: T): Unit = {
+    this.obj = Some(obj)
+  }
+
+  def cached: Option[T] =
+    obj
+}
+
+object Restos extends Cachable[List[Resto]] {
+  val callbackPrefix = "menus1"
+
+  def getKeyboard(restoIndex: Int): InlineKeyboardMarkup =
     InlineKeyboardMarkup(List((
-      if (menus.length == 1) Nil
-      else if (menuIndex == 0) List(InlineKeyboardButton("next", callbackData = callbackPrefix + "1"))
-      else if (menuIndex == menus.length - 1) List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (menuIndex-1)))
-      else List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (menuIndex-1)),
-        InlineKeyboardButton("next", callbackData = callbackPrefix + (menuIndex+1)))
+      if (cached.get.length == 1) Nil
+      else if (restoIndex == 0) List(InlineKeyboardButton("next", callbackData = callbackPrefix + "1"))
+      else if (restoIndex == cached.get.length - 1) List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (restoIndex-1)))
+      else List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (restoIndex-1)),
+        InlineKeyboardButton("next", callbackData = callbackPrefix + (restoIndex+1)))
       ):+ InlineKeyboardButton("close", callbackData = callbackPrefix + "-1")
     )
     )
@@ -111,11 +127,18 @@ case class Menu(description: String,
 {
   def isValidToShow() = true
 
-  override def toString() = {
-    "*" + description + "*\n\n" +
-    resto + "\n\n" +
+  override def toString(): String = {
+    "_" + description + "_\n\n" +
     (prix map { case (cat, prix) =>
       (if(cat.isEmpty) " "*9 else  "*" + cat + "* - ") + prix + " CHF\n"
     }).mkString("")
+  }
+}
+
+case class Resto(name: String, menus: List[Menu])
+{
+  override def toString: String = {
+    "*" + name + "*" + "\n\n" +
+    (menus map { _.toString() }).mkString("\n")
   }
 }
