@@ -6,4 +6,4 @@ addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M15-1")
 
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.8.0")
 
-addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "0.4.10")
+addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "0.6.2")
