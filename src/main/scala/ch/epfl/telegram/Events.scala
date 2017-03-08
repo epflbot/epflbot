@@ -8,7 +8,7 @@ import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.model.Element
-import org.joda.time.{DateTime, Duration, LocalDate, LocalTime, Period}
+import org.joda.time._
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatterBuilder, PeriodFormatterBuilder}
 
 /**
@@ -94,10 +94,10 @@ object Events {
 }
 
 object EventsScraper {
-  val browser = JsoupBrowser()
-  val baseUrl = "http://memento.epfl.ch/"
+  private val browser = JsoupBrowser()
+  private val baseUrl = "http://memento.epfl.ch/"
 
-  def parseEvent(eventDiv: Element): Event = {
+  private def parseEvent(eventDiv: Element): Event = {
     // Title, URL
     val titleElem = eventDiv >> element("h2 a")
     val title = titleElem >> attr("title")("a")
@@ -147,13 +147,19 @@ case class Event(title: String,
                  eventDiv: Element)  // just in case
 {
   def isValidToShow() = {
+
+    val max_event_day_span = 3
+
     val (today, time) = (LocalDate.now, LocalTime.now)
-    val startDay = startDate.toLocalDate()
+    val (startDay, startTime) = (startDate.toLocalDate(), startDate.toLocalTime)
     val (endDay, endTime) = (endDate.toLocalDate(), endDate.toLocalTime())
 
     val isToday = (today.isAfter(startDay) || today.isEqual(startDay)) &&
                   (today.isBefore(endDay) || today.isEqual(endDay))
-    isToday && time.isBefore(endTime)
+    val event_not_too_long = Days.daysBetween(startDay, endDay).getDays() <= max_event_day_span
+
+
+    (isToday && time.isBefore(endTime)) && event_not_too_long
   }
 
   override def toString() = {
@@ -185,7 +191,7 @@ case class Event(title: String,
       case (Some(loc), None) => "*At*: " + loc + "\n\n"
       case _ => ""
     }) +
-    "[export ICal link](" + exportUrl + ")\n" +
+    //"[export ICal link](" + exportUrl + ")\n" +
     "[description](" + url +")"
   }
   // override def toString() = eventDiv.toString() HTML ?...

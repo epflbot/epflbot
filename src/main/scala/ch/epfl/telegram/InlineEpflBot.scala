@@ -7,7 +7,7 @@ import scala.io.Source
 import scala.util.Properties
 
 object InlineEpflBot extends App with TelegramBot with Polling with Commands with ChatActions
-  with TL with Survey with InlineEpflDirectory with Events with Menu with Room {
+  with TL with Survey with InlineEpflDirectory with Events with Menus with Room {
 
   lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
   val version = "0.1.0"

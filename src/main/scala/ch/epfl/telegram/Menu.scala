@@ -1,17 +1,144 @@
 package ch.epfl.telegram
 
 import info.mukel.telegrambot4s.api._
+import info.mukel.telegrambot4s.models._
+import info.mukel.telegrambot4s.Implicits._
+import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
+import net.ruippeixotog.scalascraper.browser.JsoupBrowser
+import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
+import net.ruippeixotog.scalascraper.dsl.DSL._
+import net.ruippeixotog.scalascraper.model.Element
 
-import scala.collection.JavaConverters._
+/**
+  * Add Menus (EPFL Menus) useful commands.
+  */
+trait Menus extends Commands with Callbacks { _ : TelegramBot =>
 
-trait Menu extends Commands { _: TelegramBot =>
+  import Restos.callbackPrefix
 
-  on("/menu") { implicit msg => args =>
-    MenuHandler
-      .search(msg.text.orNull, args.asJava)
-      .asScala
-      .foreach { rep =>
-        reply(rep)
+  /**
+    * Crude command to get today EPFL menus. (that are not "already finished")
+    */
+  on("/menus") { implicit msg => _ =>
+
+    val restos = MenusScraper.retrieveMenus().groupBy(_.resto) map {
+      case (name, menus) => Resto(name, menus)
+    }
+
+    Restos.setCached(restos.toList)
+    Restos.cached.get match {
+      case menu::_ => reply(
+        menu.toString(),
+        replyMarkup = Restos.getKeyboard(0),
+        parseMode = ParseMode.Markdown
+      )
+      case _ => reply("nothing to show")
+    }
+
+  }
+
+  onCallbackWithTag(callbackPrefix) {
+    case clb @ CallbackQuery(_, _, Some(message), _, _, Some(data), _) =>
+      logger.debug("callback query data {}", data)
+
+      data.stripPrefix(callbackPrefix).toInt match {
+        case -1 => request (
+          EditMessageText (
+            messageId = message.messageId,
+            chatId = message.chat.id,
+            text = message.text.getOrElse("nothing to show"),  // TODO keep formatting
+            parseMode = ParseMode.Markdown
+          )
+        )
+        case index => request (
+          EditMessageText (
+            messageId = message.messageId,
+            chatId = message.chat.id,
+            text = Restos.cached.get(index).toString,
+            replyMarkup = Restos.getKeyboard(index),
+            parseMode = ParseMode.Markdown
+          )
+        )
       }
+      ackCallback()(clb)
+    case _ =>
+  }
+}
+
+trait Cachable[T] {
+
+  private var obj = Option.empty[T]
+
+  def setCached(obj: T): Unit = {
+    this.obj = Some(obj)
+  }
+
+  def cached: Option[T] =
+    obj
+}
+
+object Restos extends Cachable[List[Resto]] {
+  val callbackPrefix = "menus1"
+
+  def getKeyboard(restoIndex: Int): InlineKeyboardMarkup =
+    InlineKeyboardMarkup(List((
+      if (cached.get.length == 1) Nil
+      else if (restoIndex == 0) List(InlineKeyboardButton("next", callbackData = callbackPrefix + "1"))
+      else if (restoIndex == cached.get.length - 1) List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (restoIndex-1)))
+      else List(InlineKeyboardButton("prev", callbackData = callbackPrefix + (restoIndex-1)),
+        InlineKeyboardButton("next", callbackData = callbackPrefix + (restoIndex+1)))
+      ):+ InlineKeyboardButton("close", callbackData = callbackPrefix + "-1")
+    )
+    )
+}
+
+// TODO share similar code between menus and events => trait scrapper
+object  MenusScraper {
+  val browser = JsoupBrowser()
+  val baseUrl = "https://menus.epfl.ch/cgi-bin/getMenus"
+
+  private def parseMenu(menuDiv: Element): Menu = {
+    val description = (menuDiv >> element(".desc")).text
+    val resto = (menuDiv >> element(".resto")).text
+    val prix = {
+      val p = (menuDiv >> element(".prix")).text.split(" ")
+      (menuDiv >> elementList(".prix span")) map { elem =>
+        (elem.text, p(p.indexOf(elem.text)+1))
+      }
+    }
+    Menu(description, resto, prix, menuDiv)
+  }
+
+  def retrieveMenus(): List[Menu] = {
+    val doc = browser.get(baseUrl)
+    doc >?> elementList("#menulist li")  match {
+      case Some(menusDivs) => {
+        menusDivs.map(parseMenu(_)).filter(_.isValidToShow())
+      }
+      case None => Nil
+    }
+  }
+}
+
+case class Menu(description: String,
+                resto: String,
+                prix: List[(String, String)],
+                eventDiv: Element)  // just in case
+{
+  def isValidToShow() = true
+
+  override def toString(): String = {
+    "_" + description + "_\n\n" +
+    (prix map { case (cat, prix) =>
+      (if(cat.isEmpty) " "*9 else  "*" + cat + "* - ") + prix + " CHF\n"
+    }).mkString("")
+  }
+}
+
+case class Resto(name: String, menus: List[Menu])
+{
+  override def toString: String = {
+    "*" + name + "*" + "\n\n" +
+    (menus map { _.toString() }).mkString("\n")
   }
 }
