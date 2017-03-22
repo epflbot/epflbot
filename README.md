@@ -8,7 +8,7 @@ Telegram Bot for EPFL.
 With docker:
 
 ```shell
-docker run -d --name epflbot-es -p 9200:9200 -p 9300:9300 elasticsearch -E cluster.name="epflbot"
+docker run -d --name epflbot-es -p 9200:9200 -p 9300:9300 elasticsearch -E cluster.name="epflbot" -E transport.host=0.0.0.0
 curl http://localhost:9200/survey -X PUT
 curl http://localhost:9200/feedback -X PUT
 ```

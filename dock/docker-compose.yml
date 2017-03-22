@@ -5,7 +5,7 @@ volumes:
 
 services:
 
-  java:
+  bot:
     container_name: epflbot
     build: .
     restart: unless-stopped
@@ -14,9 +14,9 @@ services:
       - logstash:logstash
     environment:
       - EPFLBOT_TOKEN
-      - ELASTICSEARCH_INTERFACE=elasticsearch
-      - LOGSTASH_INTERFACE=logstash
-      - LOGSTASH_APPENDER=STASH
+      - EPFLBOT_ELASTICSEARCH_HOST=elasticsearch
+      - EPFLBOT_LOGSTASH_INTERFACE=logstash
+      - EPFLBOT_LOGSTASH_APPENDER=STASH
 
   elasticsearch:
     container_name: epflbot-data
@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
     volumes:
       - epflbot-data:/usr/share/elasticsearch/data
-    command: elasticsearch -E cluster.name=epflbot
+    command: elasticsearch -E cluster.name=epflbot -E transport.host=0.0.0.0
 
   kibana:
     container_name: epflbot-interface

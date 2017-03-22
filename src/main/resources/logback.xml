@@ -10,7 +10,7 @@
     <appender name="STASH" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
         <includeCallerData>true</includeCallerData>
         <appender class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
-            <destination>${LOGSTASH_INTERFACE:-localhost}:5000</destination>
+            <destination>${EPFLBOT_LOGSTASH_INTERFACE:-localhost}:5000</destination>
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                 <providers>
                     <timestamp/>
@@ -34,7 +34,7 @@
         </appender>
     </appender>
     <root level="DEBUG">
-        <appender-ref ref="${LOGSTASH_APPENDER:-STDOUT}"/>
+        <appender-ref ref="${EPFLBOT_LOGSTASH_APPENDER:-STDOUT}"/>
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="io.netty" level="WARN" />
