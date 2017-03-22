@@ -1,9 +1,9 @@
-package ch.epfl.telegram
+package ch.epfl.telegram.commands
 
-import info.mukel.telegrambot4s.api._
-import info.mukel.telegrambot4s.models._
 import info.mukel.telegrambot4s.Implicits._
+import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
+import info.mukel.telegrambot4s.models._
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL._

@@ -1,7 +1,7 @@
-package ch.epfl.telegram
+package ch.epfl.telegram.commands
 
 import akka.http.scaladsl.util.FastFuture
-import com.sksamuel.elastic4s.ElasticDsl._
+import ch.epfl.telegram.models.Reaction
 import com.typesafe.emoji.ShortCodes.Defaults._
 import com.typesafe.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits._
@@ -45,7 +45,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
         }
 
       for {
-        _    <- putAnswer(user.id, Map(question -> answer))
+        _    <- Reaction.putAnswer(user.id, Map(question -> answer))
         next <- nextQuestion(user.id, Some(questionIdx + 1))
       } {
         next match {
@@ -80,7 +80,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
   on("/feedback") { implicit msg => args =>
     for {
       user <- msg.from
-      _    <- putFeedback(user.id, args.mkString(" "))
+      _    <- Reaction.putFeedback(user.id, args.mkString(" "))
     } {
       reply("Thanks for the comment!")
     }
@@ -92,27 +92,8 @@ object Survey {
 
   val callbackPrefix = "survey1"
 
-  val surveyStore   = "survey" / "welcome"
-  val feedbackStore = "feedback" / "welcome"
-
-  def putAnswer(userId: Long, responses: Map[String, String])(implicit ec: ExecutionContext): Future[Unit] =
-    ElasticSearch {
-      update(userId) in surveyStore docAsUpsert responses
-    } map (_ => ())
-
-  def getAnswers(userId: Long)(implicit ec: ExecutionContext): Future[Map[String, String]] = {
-    ElasticSearch {
-      get(userId) from surveyStore
-    } map (_.sourceAsMap.mapValues(_.toString))
-  }
-
-  def putFeedback(userId: Long, feedback: String)(implicit ec: ExecutionContext): Future[Unit] =
-    ElasticSearch {
-      indexInto(feedbackStore) fields ("user" -> userId, "feedback" -> feedback)
-    } map (_ => ())
-
   def nextQuestion(userId: Long, nextQuestionNumber: Option[Int] = None)(
-      implicit ec: ExecutionContext): Future[Option[(String, InlineKeyboardMarkup)]] = {
+    implicit ec: ExecutionContext): Future[Option[(String, InlineKeyboardMarkup)]] = {
 
     require(nextQuestionNumber.forall(_ >= 0), "next question number cannot have negative index")
     nextQuestionNumber match {
@@ -140,7 +121,7 @@ object Survey {
         FastFuture.successful(None)
 
       case None =>
-        val res = getAnswers(userId).flatMap { responses =>
+        val res = Reaction.getAnswers(userId).flatMap { responses =>
           println(responses)
           nextQuestion(userId, Some(responses.size))
         }
@@ -153,7 +134,7 @@ object Survey {
   val tada  = "tada".emoji
 
   val introduction = s"This is a quick survey to improve your EPFLBot experience $happy.\n" +
-      "Answers are confidential and won't be publicly disclosed."
+    "Answers are confidential and won't be publicly disclosed."
 
   val generalQuestions = List(
     "What is your current position at EPFL?" -> List(
@@ -229,7 +210,7 @@ object Survey {
   )
 
   val conclusion = s"You completed the whole survey $tada. Thank you for your contributions!\n" +
-      "You can add your own ideas using:\n" +
-      "  /feedback _I'd like to see daily menu reminder!_"
+    "You can add your own ideas using:\n" +
+    "  /feedback _I'd like to see daily menu reminder!_"
 
 }

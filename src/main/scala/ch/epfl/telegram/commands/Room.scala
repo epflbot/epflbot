@@ -1,24 +1,22 @@
-package ch.epfl.telegram
+package ch.epfl.telegram.commands
 
-import info.mukel.telegrambot4s._
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 
-import util.control.Breaks._
-import org.joda.time.{DateTime, Seconds}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
-import info.mukel.telegrambot4s.methods.{AnswerCallbackQuery, AnswerInlineQuery}
-import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
-import scala.language.postfixOps
-import scala.concurrent.{Await, Future, Promise}
+import org.joda.time.DateTime
 import org.json4s._
-import scala.concurrent.duration._
 import org.json4s.jackson.JsonMethods._
+
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Promise}
+import scala.language.postfixOps
+import scala.util.control.Breaks._
 
 /**
   * Created by nghia on 30/11/16.
