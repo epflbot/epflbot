@@ -1,4 +1,4 @@
-package ch.epfl.telegram
+package ch.epfl.telegram.models
 
 import com.sksamuel.elastic4s.{ElasticsearchClientUri, Executable, TcpClient}
 

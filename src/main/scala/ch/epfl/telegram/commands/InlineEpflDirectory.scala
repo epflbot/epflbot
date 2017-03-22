@@ -1,17 +1,17 @@
-package ch.epfl.telegram
+package ch.epfl.telegram.commands
 
 import java.net.URLEncoder
 
-import scala.util.{Random, Try}
+import scala.util.Try
 //import EpflBot
-import net.ruippeixotog.scalascraper.model.Document
 import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
-import info.mukel.telegrambot4s.methods.{AnswerCallbackQuery, AnswerInlineQuery}
+import info.mukel.telegrambot4s.api.TelegramBot
+import info.mukel.telegrambot4s.methods.AnswerInlineQuery
 import info.mukel.telegrambot4s.models._
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL._
+import net.ruippeixotog.scalascraper.model.Document
 
 import scala.util.{Failure, Success}
 

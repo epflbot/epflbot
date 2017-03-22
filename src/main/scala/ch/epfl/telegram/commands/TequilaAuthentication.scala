@@ -1,4 +1,4 @@
-package ch.epfl.telegram
+package ch.epfl.telegram.commands
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding
@@ -8,17 +8,18 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.unmarshalling.PredefinedFromEntityUnmarshallers._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import com.typesafe.config.ConfigFactory
+import ch.epfl.telegram.Config
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{BotBase, Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{AnswerInlineQuery, GetMe}
 import info.mukel.telegrambot4s.models._
+import io.circe.generic.JsonCodec
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-case class EPFLUser(sciper: Int, firstName: String, name: String, email: String, gaspar: String, where: String)
+@JsonCodec case class EPFLUser(sciper: Int, firstName: String, name: String, email: String, gaspar: String, where: String)
 
 /**
   * EPFL's Tequila authentication, the process is as follows:

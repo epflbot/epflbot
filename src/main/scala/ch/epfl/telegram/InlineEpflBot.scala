@@ -1,5 +1,6 @@
 package ch.epfl.telegram
 
+import ch.epfl.telegram.commands._
 import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.methods.ParseMode
 

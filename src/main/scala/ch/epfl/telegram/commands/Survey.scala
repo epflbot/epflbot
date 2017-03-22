@@ -1,6 +1,7 @@
-package ch.epfl.telegram
+package ch.epfl.telegram.commands
 
 import akka.http.scaladsl.util.FastFuture
+import ch.epfl.telegram.models.ElasticSearch
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.typesafe.emoji.ShortCodes.Defaults._
 import com.typesafe.emoji.ShortCodes.Implicits._
