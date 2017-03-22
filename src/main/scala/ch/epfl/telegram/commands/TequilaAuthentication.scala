@@ -138,7 +138,7 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
 
   // TODO: Put this global in EPFLBot?
   private lazy val me = Await.result(request(GetMe), 10 seconds)
-  val botName         = me.firstName
+  val botName         = me.username.get
 
   val deepLinkUri = s"https://t.me/$botName" // ?start=
 
