@@ -139,11 +139,9 @@ trait TequilaAuthentication extends BotBase with Commands {
     }
   }
 
-  val config = ConfigFactory.load()
-
   import Directives._
 
-  val host = config.getString("tequila.host")
+  val host = Config.tequila.host
   val createRequestUri = s"$host/createrequest"
   val requestAuthUri = s"$host/requestauth"
   val fetchAttrsUri = s"$host/fetchattributes"
@@ -156,15 +154,15 @@ trait TequilaAuthentication extends BotBase with Commands {
   val deepLinkUri = s"https://t.me/$botName" // ?start=
 
   private val createRequestParams = {
-    val interface = config.getString("http.interface")
-    val port = config.getString("http.port")
+    val interface = Config.http.interface
+    val port = Config.http.port
 
     val params = Map(
       "urlaccess" -> s"http://$interface:$port/$tokenUri",
-      "service" -> config.getString("tequila.service"),
-      "request" -> config.getString("tequila.request"),
-      "require" -> config.getString("tequila.require"),
-      "allows" -> config.getString("tequila.allows")
+      "service" -> Config.tequila.service,
+      "request" -> Config.tequila.request,
+      "require" -> Config.tequila.require,
+      "allows" -> Config.tequila.allows
     )
     tequilaSerialize(params)
   }

@@ -2,6 +2,7 @@ name := "EPFLBot"
 version := "0.1.0"
 
 scalaVersion := "2.11.8"
+
 scalacOptions ++= Seq(
   "-deprecation",
   "-encoding",
@@ -22,17 +23,21 @@ libraryDependencies ++= Seq(
   "info.mukel"                 %% "telegrambot4s"           % "2.1.0-SNAPSHOT",
   "net.ruippeixotog"           %% "scala-scraper"           % "1.2.0",
   "com.github.nscala-time"     %% "nscala-time"             % "2.16.0",
-  "com.sksamuel.elastic4s"     %% "elastic4s-core"          % "5.2.10",
-  "com.sksamuel.elastic4s"     %% "elastic4s-tcp"           % "5.2.10",
-  "com.sksamuel.elastic4s"     %% "elastic4s-circe"         % "5.2.10",
+  "com.sksamuel.elastic4s"     %% "elastic4s-core"          % "5.2.11",
+  "com.sksamuel.elastic4s"     %% "elastic4s-tcp"           % "5.2.11",
+  "com.sksamuel.elastic4s"     %% "elastic4s-circe"         % "5.2.11",
+  "com.typesafe"               %% "emoji"                   % "1.0.0",
+  "com.iheart"                 %% "ficus"                   % "1.4.0",
   "com.vividsolutions"         % "jts"                      % "1.13",
   "org.locationtech.spatial4j" % "spatial4j"                % "0.6",
   "ch.qos.logback"             % "logback-classic"          % "1.1.6",
   "ch.qos.logback"             % "logback-access"           % "1.1.6",
   "net.logstash.logback"       % "logstash-logback-encoder" % "4.8",
-  "org.apache.logging.log4j"   % "log4j-to-slf4j"           % "2.8.1",
-  "com.typesafe"               %% "emoji"                   % "1.0.0"
+  "org.apache.logging.log4j"   % "log4j-to-slf4j"           % "2.8.1"
 )
+
+fork := true
+cancelable in Global := true
 
 test in assembly := {}
 target in assembly := file("dock")
