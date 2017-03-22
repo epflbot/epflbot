@@ -45,6 +45,13 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
 
   val tequilaToken = scala.collection.mutable.Map[String, Int]() // request_token -> telegram_user_id
 
+//  override def onMessage(message: Message): Unit = {
+//    EPFLUser.fromId(message.from.map(_.id).getOrElse(0)).foreach {
+//      case Some(_) => super.onMessage(message)
+//      case None    => reply("Please /login first.")(message)
+//    }
+//  }
+
   on("/start") { implicit msg =>
     {
       case Seq("login") =>
