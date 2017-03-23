@@ -172,9 +172,9 @@ object Survey {
       "> 50"
     ),
     "Usually how do you travel to/from EPFL?" -> List(
-      "M2",
-      "M2 + train",
-      "M2 + bus",
+      "M1",
+      "M1 + train",
+      "M1 + bus",
       "only bus",
       "bike",
       "car",
@@ -188,12 +188,50 @@ object Survey {
       "tupperware",
       "sandwiches",
       "otherwise"
+    ),
+    "How often do you use Telegram at EPFL?" -> List(
+      "all the time",
+      "daily",
+      "a few times per week",
+      "rarely",
+      "never"
+    ),
+    "What's the most useful/coolest Telegram feature?" -> List(
+      "awesome stickers",
+      "web interface",
+      "desktop application",
+      "privacy features",
+      "telegram bots",
+      "others"
+    ),
+    "At EPFL, what's your main use of Telegram?" -> List(
+      "project/study groups",
+      "1-to-1 chat with family and friends",
+      "sharing photos/files with friends",
+      "public channels",
+      "others"
+    ),
+    "Why do you prefer Telegram over other chat apps at EPFL?" -> List(
+      "because my friends use it",
+      "it has more features",
+      "privacy is a concern with other apps",
+      "others"
+    ),
+    "How many of your friends at EPFL use Telegram as well?" -> List(
+      "none",
+      "< 5",
+      "5-10",
+      "11-20",
+      "> 20",
+      "others"
     )
   )
 
   val servicesQuestions = List(
     "room booking",
-    "people search",
+    "EPFL directory search",
+    "search EPFL Telegram users",
+    "admin bot for Telegram study/project groups",
     "next public transports",
     "restaurant menu",
     "campus map search",
@@ -201,12 +239,13 @@ object Survey {
     "today's timetable",
     "today's sport classes",
     "moodle access",
-    "EPFLMeme",
+    "EPFLMemes",
     "satellite",
     "AGEPOLY services",
     "EPFL daily sum up",
     "subscribe to specific information channels",
-    "meeting new people"
+    "meeting new people",
+    "EPFL sticker pack"
   )
 
   val conclusion = s"You completed the whole survey $tada. Thank you for your contributions!\n" +
