@@ -27,11 +27,14 @@ object InlineEpflBot extends App with TelegramBot with Polling with Commands wit
           |
           |You can use /help at any moment to list available commands, for instance:
           |  - /metro
+          |  - /events
+          |  - /menus
+          |  - /room INF1
           |  - /feedback _I wish there was "meme" command!_
           |
           |Please take 2 minutes answering our /survey.
           |
-          |Ping us for feedback and suggestions!kdownString(
+          |Ping us for feedback and suggestions!
         """.stripMargin,
         parseMode = Some(ParseMode.Markdown)
       )
