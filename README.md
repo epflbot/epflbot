@@ -1,5 +1,5 @@
 # EPFLbot
-[![Build Status](https://travis-ci.com/mukel/epflbot.svg?token=d7f7szCri5ct4GZxRyqt&branch=master)](https://travis-ci.com/mukel/epflbot)
+[![Build Status](https://travis-ci.org/epflbot/epflbot.svg?branch=master)](https://travis-ci.org/epflbot/epflbot)
 
 Telegram Bot for EPFL.
 
