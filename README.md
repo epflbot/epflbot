@@ -1,7 +1,14 @@
-# EPFLbot
+# [@EPFLBot](https://t.me/EpflBot)
 [![Build Status](https://travis-ci.org/epflbot/epflbot.svg?branch=master)](https://travis-ci.org/epflbot/epflbot)
 
-Telegram Bot for EPFL.
+Telegram Bot to access EPFL services (and more) from everyday chats.
+
+Try it on Telegram [@ePfLbOt](https://t.me/EpflBot) (case insensitive).
+
+To connect using your EPFL account and have some extra goodies, go to [@EPFLBot login](https://t.me/EpflBot?start=login)
+or use the _/login_ command.
+
+It runs in [privacy mode](https://core.telegram.org/bots#privacy-mode); only has access to _/commands_ and messages where it's **@mentioned**. It does **NOT** store passwords or sensitive credentials.
 
 ## Getting started
 
