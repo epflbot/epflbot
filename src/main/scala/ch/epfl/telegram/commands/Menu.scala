@@ -19,9 +19,17 @@ trait Menus extends Commands with Callbacks { _ : TelegramBot =>
   /**
     * Crude command to get today EPFL menus. (that are not "already finished")
     */
-  on("/menus") { implicit msg => _ =>
+  on("/menus") { implicit msg => args =>
 
-    val restos = MenusScraper.retrieveMenus().groupBy(_.resto) map {
+    val restos = MenusScraper.retrieveMenus().groupBy(_.resto).filterKeys {
+      def buildPredicate(key: String, args: Seq[String]): Boolean = args match {
+        case Seq(resto, tail@_*) => key.toLowerCase.contains(resto.toLowerCase) ||
+                                    resto.toLowerCase.contains(key.toLowerCase) ||
+                                    buildPredicate(key, tail)
+        case _ => false
+      }
+      key => if (args.isEmpty) true else buildPredicate(key, args)
+    } map {
       case (name, menus) => Resto(name, menus)
     }
 
@@ -128,17 +136,17 @@ case class Menu(description: String,
   def isValidToShow() = true
 
   override def toString(): String = {
-    "_" + description + "_\n\n" +
+    "_" + description + "_\n" +
     (prix map { case (cat, prix) =>
-      (if(cat.isEmpty) " "*9 else  "*" + cat + "* - ") + prix + " CHF\n"
-    }).mkString("")
+      (if(cat.isEmpty) " "*4 else  "*" + cat + "* - ") + prix + " CHF"
+    }).mkString(", ")
   }
 }
 
 case class Resto(name: String, menus: List[Menu])
 {
   override def toString: String = {
-    "*" + name + "*" + "\n\n" +
-    (menus map { _.toString() }).mkString("\n")
+    "*" + name + "*" + "\n" +
+    (menus map { _.toString() }).mkString("\n\n")
   }
 }
