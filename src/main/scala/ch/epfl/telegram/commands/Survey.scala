@@ -78,11 +78,21 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
   }
 
   on("/feedback") { implicit msg => args =>
-    for {
-      user <- msg.from
-      _    <- Reaction.putFeedback(user.id, args.mkString(" "))
-    } {
-      reply("Thanks for the comment!")
+    val text = args.mkString(" ").trim
+    if (text.isEmpty) {
+      reply(
+        """No feedback provided!
+          |Try something like:
+          |*/feedback* A _/meme_ command would be awesome.
+        """.stripMargin,
+      parseMode = ParseMode.Markdown)
+    } else {
+      for {
+        user <- msg.from
+        _ <- Reaction.putFeedback(user.id, text)
+      } {
+        reply("Thanks for the comment!")
+      }
     }
   }
 
