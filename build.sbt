@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "com.sksamuel.elastic4s"     %% "elastic4s-core"          % "5.2.11",
   "com.sksamuel.elastic4s"     %% "elastic4s-tcp"           % "5.2.11",
   "com.sksamuel.elastic4s"     %% "elastic4s-circe"         % "5.2.11",
-  "com.typesafe"               %% "emoji"                   % "1.0.0",
+  "com.lightbend"              %% "emoji"                   % "1.1.1",
   "com.iheart"                 %% "ficus"                   % "1.4.0",
   "com.vividsolutions"         % "jts"                      % "1.13",
   "org.locationtech.spatial4j" % "spatial4j"                % "0.6",

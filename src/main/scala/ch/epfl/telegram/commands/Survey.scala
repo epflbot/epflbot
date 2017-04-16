@@ -2,8 +2,8 @@ package ch.epfl.telegram.commands
 
 import akka.http.scaladsl.util.FastFuture
 import ch.epfl.telegram.models.Reaction
-import com.typesafe.emoji.ShortCodes.Defaults._
-import com.typesafe.emoji.ShortCodes.Implicits._
+import com.lightbend.emoji.ShortCodes.Defaults._
+import com.lightbend.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Callbacks, Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
