@@ -34,7 +34,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
   onCallbackWithTag(callbackPrefix) {
     case clb @ CallbackQuery(_, user, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
-      val Array(questionIdx, answerIdx) = data.stripPrefix(callbackPrefix).split(":").map(_.toInt)
+      val Array(questionIdx, answerIdx) = data.split(":").map(_.toInt)
       val (question, answer) =
         if (questionIdx < generalQuestions.size) {
           val (question, answers) = generalQuestions(questionIdx)

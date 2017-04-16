@@ -20,7 +20,7 @@ resolvers += Resolver.typesafeIvyRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 libraryDependencies ++= Seq(
-  "info.mukel"                 %% "telegrambot4s"           % "2.1.0-SNAPSHOT",
+  "info.mukel"                 %% "telegrambot4s"           % "2.2.1-SNAPSHOT",
   "net.ruippeixotog"           %% "scala-scraper"           % "1.2.0",
   "com.github.nscala-time"     %% "nscala-time"             % "2.16.0",
   "com.sksamuel.elastic4s"     %% "elastic4s-core"          % "5.2.11",

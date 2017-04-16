@@ -49,7 +49,7 @@ trait Menus extends Commands with Callbacks { _ : TelegramBot =>
     case clb @ CallbackQuery(_, _, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
 
-      data.stripPrefix(callbackPrefix).toInt match {
+      data.toInt match {
         case -1 => request (
           EditMessageText (
             messageId = message.messageId,

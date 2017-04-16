@@ -41,7 +41,7 @@ trait TL extends Commands with Callbacks {
   onCallbackWithTag(TL_TAG) { implicit cbq =>
     for {
       msg <- cbq.message
-      dst <- cbq.data.map(_.stripPrefix(TL_TAG))
+      dst <- cbq.data
     } /* do */ {
       val text = horairesMessage(dst)
 
