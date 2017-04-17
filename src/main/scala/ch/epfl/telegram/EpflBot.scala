@@ -7,7 +7,7 @@ import info.mukel.telegrambot4s.methods.ParseMode
 import scala.io.Source
 import scala.util.Properties
 
-object InlineEpflBot extends App with TelegramBot with Polling with Commands with ChatActions
+object EpflBot extends App with TelegramBot with Polling with Commands with ChatActions
   with TL with Survey with InlineEpflDirectory with Events with Menus with Room
   // with AddYourCoolFeatureHere ...
 
