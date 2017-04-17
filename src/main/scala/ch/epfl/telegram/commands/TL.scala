@@ -117,15 +117,23 @@ object TLScraper {
     val Remaining = "(\\d+)'".r
     val HourMinutes = "(\\d+):(\\d+)".r
 
-    val lines = doc >> element("#lineDetailPage > div:nth-child(4) > div > ul") >> elements("> li > .time")
-    lines.toSeq map (_.text) collect {
-      case HourMinutes(AsInt(h), AsInt(m)) =>
-        val t = depart.withHourOfDay(h).withMinuteOfHour(m)
-        if (t < depart) t.plusDays(1) else t
+    val nextDepartures = doc >?> element("#lineDetailPage > div:nth-child(4) > div > ul")
+    val departureTimes = nextDepartures.flatMap(_ >?> elements("> li > .time"))
 
-      case Remaining(AsInt(m)) =>
-        depart.plusMinutes(m)
-    }
+    val times = for (lines <- departureTimes)
+      yield {
+        lines.toSeq.map(_.text) collect {
+          case HourMinutes(AsInt(h), AsInt(m)) =>
+            val t = depart.withHourOfDay(h).withMinuteOfHour(m)
+            if (t < depart) t.plusDays(1) else t
+
+          case Remaining(AsInt(m)) =>
+            depart.plusMinutes(m)
+        }
+      }
+
+    // There could be no departures in the next 3 hours (usually at night).
+    times.getOrElse(Seq.empty)
   }
 
   private object AsInt {
