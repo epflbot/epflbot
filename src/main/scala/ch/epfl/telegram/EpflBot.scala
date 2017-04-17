@@ -7,7 +7,7 @@ import info.mukel.telegrambot4s.methods.ParseMode
 import scala.io.Source
 import scala.util.Properties
 
-object InlineEpflBot extends App with TelegramBot with Polling with Commands with ChatActions
+object EpflBot extends App with TelegramBot with Polling with Commands with ChatActions
   with TL with Survey with InlineEpflDirectory with Events with Menus with Room
   // with AddYourCoolFeatureHere ...
 
@@ -17,7 +17,7 @@ object InlineEpflBot extends App with TelegramBot with Polling with Commands wit
   lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
   val version = "0.1.0"
 
-  on("/start") { implicit msg => {
+  on("/start", "welcome to @EPFLBot") { implicit msg => {
     case Seq() =>
       reply(
         """
@@ -41,7 +41,7 @@ object InlineEpflBot extends App with TelegramBot with Polling with Commands wit
     case _ => /* ignore */
   }}
 
-  on("/version") { implicit msg => _ =>
+  on("/version", "@EPFLBot version") { implicit msg => _ =>
     reply(s"EPFLBot v$version.")
   }
 

@@ -76,11 +76,11 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
     }
   }
 
-  on("/login") { implicit msg => _ =>
+  on("/login", "link your EPFL account") { implicit msg => _ =>
     startLogin
   }
 
-  on("/logout") { implicit msg => _ =>
+  on("/logout", "unlink your EPFL account") { implicit msg => _ =>
     for (user <- msg.from) {
       for (_ <- EPFLUser.removeId(user.id)) {
         reply("Bye bye!")

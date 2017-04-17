@@ -21,7 +21,7 @@ trait Events extends Commands with Callbacks { _ : TelegramBot =>
   /**
     * Crude command to get today EPFL events. (that are not "already finished")
     */
-  on("/events") { implicit msg => _ =>
+  on("/events", "upcoming events @ EPFL") { implicit msg => _ =>
     // TODO offer way to search for events
     Events.events = EventsScraper.retrieveEvents("?", 1)  // TODO DIRTY !!!!!!! ^^
     Events.events match {

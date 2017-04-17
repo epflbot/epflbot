@@ -19,7 +19,7 @@ trait Menus extends Commands with Callbacks { _ : TelegramBot =>
   /**
     * Crude command to get today EPFL menus. (that are not "already finished")
     */
-  on("/menus") { implicit msg => args =>
+  on("/menus", "today's menus") { implicit msg => args =>
 
     val restos = MenusScraper.retrieveMenus().groupBy(_.resto).filterKeys {
       def buildPredicate(key: String, args: Seq[String]): Boolean = args match {
@@ -49,7 +49,7 @@ trait Menus extends Commands with Callbacks { _ : TelegramBot =>
     case clb @ CallbackQuery(_, _, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
 
-      data.stripPrefix(callbackPrefix).toInt match {
+      data.toInt match {
         case -1 => request (
           EditMessageText (
             messageId = message.messageId,

@@ -1,8 +1,8 @@
 package ch.epfl.telegram.commands
 
 import com.github.nscala_time.time.Imports._
-import com.typesafe.emoji.ShortCodes.Defaults._
-import com.typesafe.emoji.ShortCodes.Implicits._
+import com.lightbend.emoji.ShortCodes.Defaults._
+import com.lightbend.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
@@ -34,14 +34,14 @@ trait TL extends Commands with Callbacks {
   /**
     * Crude command to get next next M1 departures, from EPFL, direction Flon.
     */
-  on("/metro") { implicit msg => _ =>
+  on("/metro", "interactive metro schedule") { implicit msg => _ =>
     reply(horairesMessage("Lausanne-Flon"), parseMode = ParseMode.Markdown, replyMarkup = markup)
   }
 
   onCallbackWithTag(TL_TAG) { implicit cbq =>
     for {
       msg <- cbq.message
-      dst <- cbq.data.map(_.stripPrefix(TL_TAG))
+      dst <- cbq.data
     } /* do */ {
       val text = horairesMessage(dst)
 
@@ -117,15 +117,23 @@ object TLScraper {
     val Remaining = "(\\d+)'".r
     val HourMinutes = "(\\d+):(\\d+)".r
 
-    val lines = doc >> element("#lineDetailPage > div:nth-child(4) > div > ul") >> elements("> li > .time")
-    lines.toSeq map (_.text) collect {
-      case HourMinutes(AsInt(h), AsInt(m)) =>
-        val t = depart.withHourOfDay(h).withMinuteOfHour(m)
-        if (t < depart) t.plusDays(1) else t
+    val nextDepartures = doc >?> element("#lineDetailPage > div:nth-child(4) > div > ul")
+    val departureTimes = nextDepartures.flatMap(_ >?> elements("> li > .time"))
 
-      case Remaining(AsInt(m)) =>
-        depart.plusMinutes(m)
-    }
+    val times = for (lines <- departureTimes)
+      yield {
+        lines.toSeq.map(_.text) collect {
+          case HourMinutes(AsInt(h), AsInt(m)) =>
+            val t = depart.withHourOfDay(h).withMinuteOfHour(m)
+            if (t < depart) t.plusDays(1) else t
+
+          case Remaining(AsInt(m)) =>
+            depart.plusMinutes(m)
+        }
+      }
+
+    // There could be no departures in the next 3 hours (usually at night).
+    times.getOrElse(Seq.empty)
   }
 
   private object AsInt {

@@ -2,8 +2,8 @@ package ch.epfl.telegram.commands
 
 import akka.http.scaladsl.util.FastFuture
 import ch.epfl.telegram.models.Reaction
-import com.typesafe.emoji.ShortCodes.Defaults._
-import com.typesafe.emoji.ShortCodes.Implicits._
+import com.lightbend.emoji.ShortCodes.Defaults._
+import com.lightbend.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Callbacks, Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
@@ -34,7 +34,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
   onCallbackWithTag(callbackPrefix) {
     case clb @ CallbackQuery(_, user, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
-      val Array(questionIdx, answerIdx) = data.stripPrefix(callbackPrefix).split(":").map(_.toInt)
+      val Array(questionIdx, answerIdx) = data.split(":").map(_.toInt)
       val (question, answer) =
         if (questionIdx < generalQuestions.size) {
           val (question, answers) = generalQuestions(questionIdx)
@@ -60,7 +60,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
     case _ =>
   }
 
-  on("/survey") { implicit msg => _ =>
+  on("/survey", "take our awesome (and quick) survey") { implicit msg => _ =>
     for {
       user <- msg.from
       next <- nextQuestion(user.id)
@@ -77,7 +77,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
     }
   }
 
-  on("/feedback") { implicit msg => args =>
+  on("/feedback", "leave your feedback") { implicit msg => args =>
     val text = args.mkString(" ").trim
     if (text.isEmpty) {
       reply(

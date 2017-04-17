@@ -20,13 +20,13 @@ resolvers += Resolver.typesafeIvyRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 libraryDependencies ++= Seq(
-  "info.mukel"                 %% "telegrambot4s"           % "2.1.0-SNAPSHOT",
+  "info.mukel"                 %% "telegrambot4s"           % "2.2.1-SNAPSHOT",
   "net.ruippeixotog"           %% "scala-scraper"           % "1.2.0",
   "com.github.nscala-time"     %% "nscala-time"             % "2.16.0",
   "com.sksamuel.elastic4s"     %% "elastic4s-core"          % "5.2.11",
   "com.sksamuel.elastic4s"     %% "elastic4s-tcp"           % "5.2.11",
   "com.sksamuel.elastic4s"     %% "elastic4s-circe"         % "5.2.11",
-  "com.typesafe"               %% "emoji"                   % "1.0.0",
+  "com.lightbend"              %% "emoji"                   % "1.1.1",
   "com.iheart"                 %% "ficus"                   % "1.4.0",
   "com.vividsolutions"         % "jts"                      % "1.13",
   "org.locationtech.spatial4j" % "spatial4j"                % "0.6",
@@ -42,7 +42,7 @@ cancelable in Global := true
 test in assembly := {}
 target in assembly := file("dock")
 assemblyJarName in assembly := "epflbot.jar"
-mainClass in assembly := Some("ch.epfl.telegram.InlineEpflBot")
+mainClass in assembly := Some("ch.epfl.telegram.EpflBot")
 assemblyMergeStrategy in assembly := {
   case "META-INF/io.netty.versions.properties"       => MergeStrategy.first
   case "META-INF/log4j-provider.properties"          => MergeStrategy.first
