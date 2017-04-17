@@ -34,7 +34,7 @@ trait TL extends Commands with Callbacks {
   /**
     * Crude command to get next next M1 departures, from EPFL, direction Flon.
     */
-  on("/metro") { implicit msg => _ =>
+  on("/metro", "interactive metro schedule") { implicit msg => _ =>
     reply(horairesMessage("Lausanne-Flon"), parseMode = ParseMode.Markdown, replyMarkup = markup)
   }
 

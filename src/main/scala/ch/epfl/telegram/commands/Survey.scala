@@ -60,7 +60,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
     case _ =>
   }
 
-  on("/survey") { implicit msg => _ =>
+  on("/survey", "take our awesome (and quick) survey") { implicit msg => _ =>
     for {
       user <- msg.from
       next <- nextQuestion(user.id)
@@ -77,7 +77,7 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
     }
   }
 
-  on("/feedback") { implicit msg => args =>
+  on("/feedback", "leave your feedback") { implicit msg => args =>
     val text = args.mkString(" ").trim
     if (text.isEmpty) {
       reply(

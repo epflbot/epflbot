@@ -28,7 +28,7 @@ import scala.util.control.Breaks._
 trait Room extends Commands {
   _ : TelegramBot =>
 
-  on("/room") { implicit msg => args =>
+  on("/room", "current room occupancy") { implicit msg => args =>
     val responses =  Room.get(URLEncoder.encode(args mkString " ", "UTF-8"))
     reply(responses)
   }
