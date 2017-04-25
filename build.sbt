@@ -1,7 +1,7 @@
 name := "EPFLBot"
 version := "0.1.0"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.1"
 
 scalacOptions ++= Seq(
   "-deprecation",
