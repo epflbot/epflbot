@@ -114,7 +114,7 @@ object Survey {
           case (answer, i) =>
             InlineKeyboardButton(answer, callbackData = s"$callbackPrefix$step:$i")
         }.toList
-        val next = s"*$question*" -> InlineKeyboardMarkup(buttons.grouped(2).toList)
+        val next = s"*$question*" -> InlineKeyboardMarkup(buttons.grouped(1).toList)
         FastFuture.successful(next)
 
       case Some(step) if step < generalQuestions.size + servicesQuestions.size =>
