@@ -8,7 +8,7 @@ import scala.io.Source
 import scala.util.Properties
 
 object EpflBot extends App with TelegramBot with Polling with Commands with ChatActions
-  with TL with Survey with InlineEpflDirectory with Events with Menus with Room
+  with TL with Survey with InlineEpflDirectory with Events with Menus with Room with Beers
   // with AddYourCoolFeatureHere ...
 
   /* The access-control trait must be the last */
