@@ -1,7 +1,7 @@
 name := "EPFLBot"
 version := "0.1.0"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.11"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -50,3 +50,8 @@ assemblyMergeStrategy in assembly := {
   case x if x.startsWith("io/netty")                 => MergeStrategy.first
   case x                                             => (assemblyMergeStrategy in assembly).value(x)
 }
+
+enablePlugins(BuildInfoPlugin)
+buildInfoPackage := "BuildInfo"
+buildInfoPackage := "ch.epfl.telegram"
+buildInfoKeys := List[BuildInfoKey](version)
