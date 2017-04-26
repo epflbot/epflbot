@@ -9,6 +9,8 @@ import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.model.{Document, Element}
 
+import scala.util.Random
+
 /**
   * Add Satellite useful commands (beer...).
   */
@@ -36,12 +38,21 @@ trait Beers extends Commands with Callbacks { _ : TelegramBot =>
     case clb@CallbackQuery(_, _, Some(message), _, _, Some(data), _) =>
       logger.debug("callback query data {}", data)
 
+      // TODO clean common code..
       data match {
         case "close" => request (
           EditMessageText (
             messageId = message.messageId,
             chatId = message.chat.id,
             text = message.text.getOrElse("nothing to show"),
+            parseMode = ParseMode.Markdown
+          )
+        )
+        case "random" => request (
+          EditMessageText (
+            messageId = message.messageId,
+            chatId = message.chat.id,
+            text = Sat.cached.get.randomBeer().toString(),
             parseMode = ParseMode.Markdown
           )
         )
@@ -57,7 +68,7 @@ trait Beers extends Commands with Callbacks { _ : TelegramBot =>
           EditMessageText(messageId = message.messageId,
             chatId = message.chat.id,
             text = Sat.cached.get.items(cat).map { _.toString() }.mkString("\n"),
-            replyMarkup = InlineKeyboardMarkup(Seq(Seq(InlineKeyboardButton("back", callbackData = callbackPrefix + "back")))),
+            replyMarkup = InlineKeyboardMarkup(Seq(Seq(Sat.backButton))),
             parseMode = ParseMode.Markdown
           )
         )
@@ -70,10 +81,14 @@ trait Beers extends Commands with Callbacks { _ : TelegramBot =>
 object Sat extends Cachable[Satellite] {
   val callbackPrefix = "satellite1"
 
+  val closeButton = InlineKeyboardButton("close", callbackData = callbackPrefix + "close")
+  val randButton = InlineKeyboardButton("*random*", callbackData = callbackPrefix + "random")
+  val backButton = InlineKeyboardButton("back", callbackData = callbackPrefix + "back")
+
   def getMenuKeyboard(): InlineKeyboardMarkup =
     InlineKeyboardMarkup((cached.get.items.keys.map { cat =>
         InlineKeyboardButton(cat, callbackData = callbackPrefix + cat)
-    }.toSeq :+ InlineKeyboardButton("close", callbackData = callbackPrefix + "close")).grouped(2).toSeq)
+    }.toSeq :+ randButton :+ closeButton).grouped(2).toSeq)
 }
 
 object  SatScraper {
@@ -140,6 +155,8 @@ case class Beer(name: Option[String],
 
 case class Satellite(items: Map[String, List[Beer]])
 {
+  def randomBeer(): Beer = Random.shuffle(items.values.flatten).head
+
   override def toString(): String = {
     "beers @ sat (/beers) !!\n"
   }
