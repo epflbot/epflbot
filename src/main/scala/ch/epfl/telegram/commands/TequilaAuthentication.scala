@@ -61,7 +61,7 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
         // Greet the user
         for (user <- msg.from) {
           EPFLUser.fromId(user.id).foreach {
-            case Some(EPFLUser(_, _, firstName, _, _, _, _)) =>
+            case Some(EPFLUser(_, _, firstName, _, _, _, _, _, _)) =>
               reply(
                 s"Hi, $firstName!\n" +
                   "You are successfully authenticated with your EPFL account.\n" +
@@ -206,10 +206,12 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
           tequilaToken.synchronized {
             for (userId <- tequilaToken.get(key)) {
               val epflUser = EPFLUser(
-                id = userId,
+                id = Some(userId),
                 sciper = data("uniqueid").toInt,
                 firstName = data("firstname"),
                 name = data("name"),
+                displayName = data("firstname") + " " + data("name"),
+                employeeType = None,
                 email = data("email"),
                 gaspar = data("user"),
                 where = data("where")
