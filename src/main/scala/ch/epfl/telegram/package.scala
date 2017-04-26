@@ -9,6 +9,7 @@ import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 package object telegram {
 
   LogManager.getLogManager.readConfiguration()
+  lazy val version = BuildInfo.version // sbt build info created at compiled time
 
   val Config = ConfigFactory.load().as[EPFLBotConfig]("epflbot")
 
