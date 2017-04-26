@@ -80,7 +80,7 @@ class ScalaSocketIO(socketURI: String) { self =>
         }
         ret.complete(json)
       }
-    }, json.asJson.noSpaces)
+    }, new JSONObject(json.asJson.noSpaces))
     ret.future
   }
 
