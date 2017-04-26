@@ -56,7 +56,7 @@ trait Beers extends Commands with Callbacks { _ : TelegramBot =>
         case cat => request(
           EditMessageText(messageId = message.messageId,
             chatId = message.chat.id,
-            text = Sat.cached.get.items(cat).map { _.toString() }.mkString("\n\n"),
+            text = Sat.cached.get.items(cat).map { _.toString() }.mkString("\n"),
             replyMarkup = InlineKeyboardMarkup(Seq(Seq(InlineKeyboardButton("back", callbackData = callbackPrefix + "back")))),
             parseMode = ParseMode.Markdown
           )
@@ -73,7 +73,7 @@ object Sat extends Cachable[Satellite] {
   def getMenuKeyboard(): InlineKeyboardMarkup =
     InlineKeyboardMarkup((cached.get.items.keys.map { cat =>
         InlineKeyboardButton(cat, callbackData = callbackPrefix + cat)
-    }.toSeq :+ InlineKeyboardButton("close", callbackData = callbackPrefix + "close")).grouped(3).toSeq)
+    }.toSeq :+ InlineKeyboardButton("close", callbackData = callbackPrefix + "close")).grouped(2).toSeq)
 }
 
 object  SatScraper {
@@ -134,7 +134,7 @@ case class Beer(name: Option[String],
     typ.map("_type_: " + _ + "\n").getOrElse("") +
     prix.map("_prix_: " + _ + contenu.map(" (" + _ + ")").getOrElse("") + "\n").getOrElse("") +
     pays.map("_pays_: " + _ + "\n").getOrElse("") +
-    description.map("\n" + _ ).getOrElse("")
+    description.map(_ + "\n").getOrElse("")
   }
 }
 
