@@ -141,6 +141,6 @@ case class Beer(name: Option[String],
 case class Satellite(items: Map[String, List[Beer]])
 {
   override def toString(): String = {
-    "beers @ sat !!\n"
+    "beers @ sat (/beers) !!\n"
   }
 }
