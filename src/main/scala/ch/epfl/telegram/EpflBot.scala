@@ -29,7 +29,9 @@ object EpflBot
     /* The access-control trait must be the last */
     with TequilaAuthentication {
 
-  lazy val token = Properties.envOrNone("EPFLBOT_TOKEN").getOrElse(Source.fromFile("token").getLines().mkString)
+  lazy val token = Properties
+      .envOrNone("EPFLBOT_TOKEN")
+      .getOrElse(Source.fromFile("token").getLines().mkString)
 
   override def routes: Route =
     super.routes ~
