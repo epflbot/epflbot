@@ -16,3 +16,4 @@ project/plugins/project/
 .ensime
 .idea
 token
+.env
