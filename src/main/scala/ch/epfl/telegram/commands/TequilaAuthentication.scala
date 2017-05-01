@@ -5,10 +5,10 @@ import akka.http.scaladsl.client.RequestBuilding
 import akka.http.scaladsl.marshalling.PredefinedToEntityMarshallers._
 import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives
+import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.unmarshalling.PredefinedFromEntityUnmarshallers._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import ch.epfl.telegram.Config
+import ch.epfl.telegram.{Config, EpflBot, WebTelegramBot}
 import ch.epfl.telegram.models.EPFLUser
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{BotBase, Commands, TelegramBot}
@@ -41,7 +41,7 @@ import scala.language.postfixOps
   * If the authentication succeeds, the user will be redirected to the "?start=success" sub-command
   * to confirm that the login was successful.
   */
-trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
+trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegramBot =>
 
   val tequilaToken = scala.collection.mutable.Map[String, Int]() // request_token -> telegram_user_id
 
@@ -135,8 +135,6 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
     }
   }
 
-  import Directives._
-
   val host             = Config.tequila.host
   val createRequestUri = s"$host/createrequest"
   val requestAuthUri   = s"$host/requestauth"
@@ -194,7 +192,7 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
       }
       .toMap
 
-  val routes =
+  override abstract def routes: Route = super.routes ~ {
     pathPrefix(tokenUri) {
       parameters("key") { key =>
         val redirection = for {
@@ -226,10 +224,6 @@ trait TequilaAuthentication extends BotBase with Commands { _: TelegramBot =>
         Await.result(redirection, 10 seconds)
       }
     }
-
-  override abstract def run(): Unit = {
-    super.run()
-    // TODO: Fix this to work on the server
-    Http().bindAndHandle(routes, "::0", 8080)
   }
+
 }
