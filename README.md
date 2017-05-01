@@ -15,7 +15,7 @@ It runs in [privacy mode](https://core.telegram.org/bots#privacy-mode); only has
 With docker:
 
 ```shell
-docker run -d --name epflbot-es -p 9200:9200 -p 9300:9300 elasticsearch -E cluster.name="epflbot" -E transport.host=0.0.0.0
+docker-compose up -d
 ```
 
 On Linux, if docker fails to spawn elasticsearch run ```sudo sysctl -w vm.max_map_count=262144```
@@ -32,8 +32,7 @@ sbt
 
 ```shell
 sbt clean assembly
-cd dock
 cp .env.example .env
 vim .env
-docker-compose up --build
+docker-compose up --build -f docker-compose-prod.yml
 ```

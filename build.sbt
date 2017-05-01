@@ -28,27 +28,26 @@ libraryDependencies ++= {
   val elasticV = "5.3.2"
 
   Seq(
-    "info.mukel"                 %% "telegrambot4s"           % "2.2.1-SNAPSHOT",
-    "net.ruippeixotog"           %% "scala-scraper"           % "1.2.0",
-    "com.github.nscala-time"     %% "nscala-time"             % "2.16.0",
-    "com.sksamuel.elastic4s"     %% "elastic4s-core"          % elasticV,
-    "com.sksamuel.elastic4s"     %% "elastic4s-tcp"           % elasticV,
-    "com.sksamuel.elastic4s"     %% "elastic4s-circe"         % elasticV,
-    "com.lightbend"              %% "emoji"                   % "1.1.1",
-    "com.iheart"                 %% "ficus"                   % "1.4.0",
-    "com.vividsolutions"         % "jts"                      % "1.13",
-    "org.locationtech.spatial4j" % "spatial4j"                % "0.6",
-    "ch.qos.logback"             % "logback-classic"          % "1.1.6",
-    "ch.qos.logback"             % "logback-access"           % "1.1.6",
-    "net.logstash.logback"       % "logstash-logback-encoder" % "4.8",
-    "org.apache.logging.log4j"   % "log4j-to-slf4j"           % "2.8.1"
+    "info.mukel"                 %% "telegrambot4s"                 % "2.2.1-SNAPSHOT",
+    "net.ruippeixotog"           %% "scala-scraper"                 % "1.2.1",
+    "com.github.nscala-time"     %% "nscala-time"                   % "2.16.0",
+    "com.sksamuel.elastic4s"     %% "elastic4s-core"                % elasticV,
+    "com.sksamuel.elastic4s"     %% "elastic4s-tcp"                 % elasticV,
+    "com.sksamuel.elastic4s"     %% "elastic4s-circe"               % elasticV,
+    "com.lightbend"              %% "emoji"                         % "1.1.1",
+    "com.iheart"                 %% "ficus"                         % "1.4.0",
+    "com.vividsolutions"         % "jts"                            % "1.13",
+    "org.locationtech.spatial4j" % "spatial4j"                      % "0.6",
+    "ch.qos.logback"             % "logback-classic"                % "1.2.3",
+    "ch.qos.logback"             % "logback-access"                 % "1.2.3",
+    "com.internetitem"           % "logback-elasticsearch-appender" % "1.5",
+    "org.apache.logging.log4j"   % "log4j-to-slf4j"                 % "2.8.2"
   )
 }
 
 fork := true
 cancelable in Global := true
 parallelExecution in Test := false
-
 
 assemblyJarName in assembly := "epflbot.jar"
 test in assembly := {}
