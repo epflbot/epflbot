@@ -41,7 +41,8 @@ libraryDependencies ++= {
     "ch.qos.logback"             % "logback-classic"                % "1.2.3",
     "ch.qos.logback"             % "logback-access"                 % "1.2.3",
     "com.internetitem"           % "logback-elasticsearch-appender" % "1.5",
-    "org.apache.logging.log4j"   % "log4j-to-slf4j"                 % "2.8.2"
+    "org.apache.logging.log4j"   % "log4j-to-slf4j"                 % "2.8.2",
+    "com.unboundid"              % "unboundid-ldapsdk"              % "3.2.1"
   )
 }
 
