@@ -4,11 +4,16 @@ import ch.epfl.telegram.models.EPFLUser
 import com.unboundid.ldap.sdk._
 import com.unboundid.ldap.sdk.SearchScope
 
+import scala.concurrent.Await
 import scala.util.Try
 import scala.util.control.NonFatal
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
+/**
+  * Populates the 'user / epfl' index mirroring the whole EPFL directory.
+  * Login information (linked accounts) will be lost.
+  */
 object LDAP extends App {
 
   def scrap(filter: String) = {
@@ -39,8 +44,8 @@ object LDAP extends App {
 
     Try (
       EPFLUser(
-        id = None,
-        sciper = data("uniqueIdentifier").toInt,
+        id = data("uniqueIdentifier").toInt,
+        telegramInfo = None,
         firstName =  data("givenName"),
         name = data("sn"),
         displayName = data("displayName"),
@@ -54,5 +59,6 @@ object LDAP extends App {
 
   val entries = scrap("(employeeType=*)")
   val users = entries.flatMap(x => toEPFLUser(x))
-  EPFLUser.putUserBySciper(users)
+  println("Inserting " + users.size + " EPFL users...")
+  Await.result(EPFLUser.putUserSeq(users), 1.minute)
 }
