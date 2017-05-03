@@ -1,6 +1,7 @@
 package ch.epfl.telegram
 
 import ch.epfl.telegram.models.EPFLUser
+import com.typesafe.scalalogging.Logger
 import com.unboundid.ldap.sdk._
 import com.unboundid.ldap.sdk.SearchScope
 
@@ -16,13 +17,16 @@ import scala.concurrent.duration._
   */
 object LDAP extends App {
 
-  def scrap(filter: String) = {
+  val logger = Logger(getClass)
+
+  def scrap(filter: String): Array[SearchResultEntry] = {
     val ldap = new LDAPConnection()
     try
       ldap.connect("ldap.epfl.ch", 389)
     catch {
       case NonFatal(e)  =>
-        System.err.println("Ldap exception")
+        logger.error("LDAP connection failed")
+        throw e
     }
     require (ldap.isConnected)
     val t = ldap.search("o=epfl,c=ch", SearchScope.SUB, filter)
@@ -30,16 +34,28 @@ object LDAP extends App {
   }
 
   def toEPFLUser(sre: SearchResultEntry): Option[EPFLUser] = {
-      val wantedAtts = Set("uniqueIdentifier", "givenName","sn", "displayName", "ou", "employeeType", "mail", "uid")
+
+    // LDAP specific attributes.
+    val wantedAtts = Set(
+      "uniqueIdentifier",
+      "givenName",
+      "sn",
+      "displayName",
+      "ou",
+      "employeeType",
+      "mail",
+      "uid")
+
     val atts = for {
       a <- sre.getAttributes.toArray(Array[Attribute]())
+      // Ignored binary attributes (e.g. certificates)
       if !a.getName().contains("binary") && wantedAtts.contains(a.getName())
+    } yield {
+      val name = a.getName()
+      val value = if (name != "uid") a.getValues().last else a.getValues().head
+      (name -> value)
     }
-      yield {
-        val name = a.getName()
-        val value = if(name != "uid") a.getValues().last else a.getValues().head
-        (name -> value)
-      }
+
     val data = atts.toMap
 
     Try (
@@ -59,6 +75,6 @@ object LDAP extends App {
 
   val entries = scrap("(employeeType=*)")
   val users = entries.flatMap(x => toEPFLUser(x))
-  println("Inserting " + users.size + " EPFL users...")
+  logger.debug("Inserting " + users.size + " EPFL users...")
   Await.result(EPFLUser.putUserSeq(users), 1.minute)
 }
