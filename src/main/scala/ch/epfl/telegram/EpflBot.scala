@@ -18,6 +18,7 @@ object EpflBot
     with Commands
     with ChatActions
     with TL
+    with Bus
     with Survey
     with InlineEpflDirectory
     with Events
