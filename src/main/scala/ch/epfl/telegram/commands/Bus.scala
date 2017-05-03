@@ -20,6 +20,8 @@ trait Bus extends Commands with Callbacks {
 
   private val BUS_TAG = "BUS_TAG"
 
+  private def tag(text : String): String = prefixTag(BUS_TAG)(text)
+
   private val RunningTime = 8
   private val WalkingTime = 32
 
@@ -72,15 +74,20 @@ trait Bus extends Commands with Callbacks {
   }
 
   def markup(busNumber : Int) : InlineKeyboardMarkup = {
-    val source = InlineKeyboardButton(busSrcDest(busNumber)._1, callbackData = Some(BUS_TAG + busNumber + "#" + busSrcDest(busNumber)._1))
-    val dest = InlineKeyboardButton(busSrcDest(busNumber)._2, callbackData = Some(BUS_TAG + busNumber + "#" + busSrcDest(busNumber)._2))
+    val source = InlineKeyboardButton( busSrcDest(busNumber)._1,
+      callbackData = Some(tag(busNumber + "#" + busSrcDest(busNumber)._1)))
+
+    val dest = InlineKeyboardButton(busSrcDest(busNumber)._2,
+      callbackData = Some(tag(busNumber + "#" + busSrcDest(busNumber)._2)))
     InlineKeyboardMarkup(Seq(Seq(source, dest)))
   }
 
   def horairesMessage(busNumber : Int, destination: String): String = {
     val now = DateTime.now
 
-    val header = now.toString("HH:mm:ss") +  " " + "bus".emoji + " Bus: " + busNumber + "\nEPFL ➜ " + destination
+    val header = now.toString("HH:mm:ss") +  " " + "bus".emoji + " Bus: " + busNumber +
+                "\nEPFL ➜ " + destination
+    
     val code = busCode(busNumber)(destination)
     val stopName = epflStops(busNumber)
 
