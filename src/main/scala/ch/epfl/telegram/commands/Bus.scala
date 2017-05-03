@@ -87,7 +87,7 @@ trait Bus extends Commands with Callbacks {
 
     val header = now.toString("HH:mm:ss") +  " " + "bus".emoji + " Bus: " + busNumber +
                 "\nEPFL ➜ " + destination
-    
+
     val code = busCode(busNumber)(destination)
     val stopName = epflStops(busNumber)
 
@@ -119,7 +119,7 @@ object BusScraper {
 
    val doc = browser.get(baseUrl + dir)
 
-    val Remaining = "(\\d+)'".r
+    val Remaining = "~?(\\d+)'".r
 
     val nextDepartures = doc >> element(".table > tbody:nth-child(1)")
 
