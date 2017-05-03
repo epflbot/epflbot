@@ -5,19 +5,18 @@ import akka.http.scaladsl.client.RequestBuilding
 import akka.http.scaladsl.marshalling.PredefinedToEntityMarshallers._
 import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.{Directives, Route}
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.unmarshalling.PredefinedFromEntityUnmarshallers._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import ch.epfl.telegram.{Config, EpflBot, WebTelegramBot}
-import ch.epfl.telegram.models.EPFLUser
+import ch.epfl.telegram.models.{EPFLUser, TelegramInfo}
+import ch.epfl.telegram.{Config, WebTelegramBot}
 import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.api.{BotBase, Commands, TelegramBot}
+import info.mukel.telegrambot4s.api.Commands
 import info.mukel.telegrambot4s.methods.{AnswerInlineQuery, GetMe}
 import info.mukel.telegrambot4s.models._
-import io.circe.generic.JsonCodec
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 /**
@@ -36,14 +35,14 @@ import scala.language.postfixOps
   *   - ?start=success
   *
   * The "login" subcommand will get a requestKey from EPFL's Tequila servers, and
-  * will provide an autnehtication link.
+  * will provide an authentication link.
   *
   * If the authentication succeeds, the user will be redirected to the "?start=success" sub-command
   * to confirm that the login was successful.
   */
 trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegramBot =>
 
-  val tequilaToken = scala.collection.mutable.Map[String, Int]() // request_token -> telegram_user_id
+  val tequilaToken = scala.collection.mutable.Map[String, TelegramInfo]() // request_token -> telegram_user_info
 
 //  override def onMessage(message: Message): Unit = {
 //    EPFLUser.fromId(message.from.map(_.id).getOrElse(0)).foreach {
@@ -59,17 +58,18 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
 
       case Seq("success") =>
         // Greet the user
-        for (user <- msg.from) {
-          EPFLUser.fromId(user.id).foreach {
-            case Some(EPFLUser(_, _, firstName, _, _, _, _)) =>
-              reply(
-                s"Hi, $firstName!\n" +
-                  "You are successfully authenticated with your EPFL account.\n" +
-                  "@EPFLBot DO NOT store any sensible information such as passwords or personal data.",
-                replyMarkup = ReplyKeyboardRemove()
-              )
-            case None =>
-          }
+        for {
+          user <- msg.from
+          linkedAccounts <- EPFLUser.fromTelegramId(user.id)
+        } /* do */ {
+          if (linkedAccounts.nonEmpty)
+            reply(
+               s"Hi, ${user.firstName}!\n" +
+                "You are successfully authenticated with your EPFL account.\n" +
+                "@EPFLBot DO NOT store any sensible information such as passwords or personal data.",
+                replyMarkup = ReplyKeyboardRemove())
+          else
+            reply("Your /login attempt failed.")
         }
 
       case _ => /* ignore */
@@ -82,27 +82,54 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
 
   on("/logout", "unlink your EPFL account") { implicit msg => _ =>
     for (user <- msg.from) {
-      for (_ <- EPFLUser.removeId(user.id)) {
+      for (linkedAccounts <- EPFLUser.fromTelegramId(user.id)) {
+        EPFLUser.putUserSeq(linkedAccounts.map(_.copy(telegramInfo = None)))
         reply("Bye bye!")
       }
     }
   }
 
-  override def onInlineQuery(inlineQuery: InlineQuery): Unit =
-    EPFLUser.fromId(inlineQuery.from.id).map {
-      case Some(epflUser) =>
+  on("/status", "shows authentication status") { implicit msg => _ =>
+    for {
+      user <- msg.from
+      linkedAccounts <- EPFLUser.fromTelegramId(user.id)
+    } /* do */ {
+      if (linkedAccounts.isEmpty)
+        reply("You have no EPFL account linked.\n"+
+              "Please /login first.")
+      else {
+        val desc = for (account <- linkedAccounts)
+          yield
+            account.email
+        reply("You have linked the following EPFL account(s):\n" +
+              desc.mkString("\n"))
+      }
+    }
+  }
+
+  // In order to search the EPFL directory user must be authenticated.
+  override def onInlineQuery(inlineQuery: InlineQuery): Unit = {
+    for (linkedAccounts <- EPFLUser.fromTelegramId(inlineQuery.from.id)) {
+      // If the user have an EPFL account associated, let the query pass
+      // to the upper level (InlineEPFLDirectory).
+      if (linkedAccounts.nonEmpty)
         super.onInlineQuery(inlineQuery)
-      case None =>
+      else {
+        // Otherwise block the inline query and ask the user to authenticate
+        // using his EPFL account.
+
         // This only works on Telegram mobile (tested on Android)
         // TODO: Report to Telegram support
         request(
           AnswerInlineQuery(inlineQuery.id,
-                            cacheTime = 1,
-                            switchPmText = "Connect to your EPFL account!",
-                            results = Seq.empty,
-                            switchPmParameter = "login")
+            cacheTime = 1,
+            switchPmText = "Link your EPFL account!",
+            results = Seq.empty,
+            switchPmParameter = "login")
         )
+      }
     }
+  }
 
   def startLogin(implicit msg: Message): Unit = {
     for (user <- msg.from) {
@@ -124,12 +151,11 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
             val uri = requestAuth(key)
 
             tequilaToken.synchronized {
-              tequilaToken(key) = user.id
+              tequilaToken(key) = TelegramInfo(user.id, user.username)
             }
 
             reply(s"Open this link to authenticate:\n ${uri.toString()}", replyMarkup = ReplyKeyboardRemove())
           }
-
         }
       }
     }
@@ -201,20 +227,22 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
         } yield {
           val data = tequilaDeserialize(res)
 
-          tequilaToken.synchronized {
-            for (userId <- tequilaToken.get(key)) {
-              val epflUser = EPFLUser(
-                id = userId,
-                sciper = data("uniqueid").toInt,
-                firstName = data("firstname"),
-                name = data("name"),
-                email = data("email"),
-                gaspar = data("user"),
-                where = data("where")
-              )
-              EPFLUser.putUser(epflUser)
+          val telegramInfoOpt = tequilaToken.synchronized { tequilaToken.get(key) }
+          val sciper = data("uniqueid").toInt
+
+          val updateTelegramInfo =
+            for (telegramInfo <- telegramInfoOpt) yield {
+              EPFLUser.fromId(sciper).flatMap {
+                case Some(epflUser) =>
+                  EPFLUser.putUser(epflUser.copy(telegramInfo = Some(telegramInfo)))
+
+                case None => Future.successful(())
+              }
             }
-          }
+
+          // Blocking is inevitable.
+          // This should be rather (also) on a memory backed storage.
+          updateTelegramInfo.foreach { Await.result(_, 5.seconds) }
 
           redirect(deepLink("success"), StatusCodes.TemporaryRedirect)
         }
