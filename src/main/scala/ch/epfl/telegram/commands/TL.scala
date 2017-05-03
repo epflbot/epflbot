@@ -98,8 +98,8 @@ object TLScraper {
   def horaires(direction: String, depart: DateTime = DateTime.now): Seq[DateTime] = {
 
     val directions = Map(
-      "Lausanne-Flon" -> "line_detail.php?id=3377704015495518&line=11821953316814882&id_direction=11821953316814882&id_stop=2533279085551931",
-      "Renens"        -> "line_detail.php?id=3377704015495520&line=11821953316814882&id_direction=11821953316814882&id_stop=2533279085551946"
+      "Lausanne-Flon" -> "line_detail.php?id=3377704015495518&line=11821953316814882&id_stop=2533279085549596&id_direction=11821953316814882",
+      "Renens"        -> "line_detail.php?id=3377704015495520&line=11821953316814882&id_stop=2535851770776450&id_direction=11821953316814882"
     )
 
     directions.get(direction)
@@ -107,17 +107,18 @@ object TLScraper {
       .getOrElse(Seq.empty)
   }
 
-
-
   private def scrapDepartures(path: String, depart: DateTime = DateTime.now): Seq[DateTime] = {
+    val targetUrl = baseUrl + path +
+        s"&jour=${depart.getYear}/${depart.getMonthOfYear}/${depart.getDayOfMonth}" +
+        s"&heure=${depart.getHourOfDay}" +
+        s"&minute=${depart.getMinuteOfHour}"
 
-    val timeParams = s"&jour=${depart.getYear}%2F${depart.getMonthOfYear}%2F${depart.getDayOfMonth}&heure=${depart.getHourOfDay}&minute=${depart.getMinuteOfHour}"
-    val doc = browser.get(baseUrl + path + timeParams)
+    val doc = browser.get(targetUrl)
 
     val Remaining = "(\\d+)'".r
     val HourMinutes = "(\\d+):(\\d+)".r
 
-    val nextDepartures = doc >?> element("#lineDetailPage > div:nth-child(4) > div > ul")
+    val nextDepartures = doc >?> element("#lineDetailPage > div[data-role='content'] > div > ul")
     val departureTimes = nextDepartures.flatMap(_ >?> elements("> li > .time"))
 
     val times = for (lines <- departureTimes)

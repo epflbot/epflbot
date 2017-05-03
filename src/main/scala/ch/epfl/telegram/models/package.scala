@@ -13,7 +13,7 @@ package object models {
     )
   }
 
-  List(Reaction.feedbackIndex, Reaction.surveyIndex, EPFLUser.userIndex)
+  List(Reaction.feedbackIndex, Reaction.surveyIndex, EPFLUser.epflUserIndex)
     .foreach { indexType =>
       println(indexType)
       es.execute {
