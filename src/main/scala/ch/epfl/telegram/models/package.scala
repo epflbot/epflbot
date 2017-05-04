@@ -17,8 +17,9 @@ package object models {
     .foreach { indexType =>
       println(indexType)
       es.execute {
-        createIndex(indexType.index)
-      }.map(println)
+          createIndex(indexType.index)
+        }
+        .map(println)
     }
 
 }

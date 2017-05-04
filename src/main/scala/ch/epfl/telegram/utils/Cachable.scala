@@ -1,4 +1,4 @@
-package ch.epfl.telegram.commands
+package ch.epfl.telegram.utils
 
 trait Cachable[T] {
 

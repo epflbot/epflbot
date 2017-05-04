@@ -4,12 +4,11 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import ch.epfl.telegram.commands._
 import info.mukel.telegrambot4s.api._
-import info.mukel.telegrambot4s.methods.ParseMode
 
+import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.io.Source
 import scala.util.Properties
-import scala.concurrent.duration._
 
 object EpflBot
     extends App
@@ -25,14 +24,15 @@ object EpflBot
     with Menus
     with Room
     with About
+    with Beers
     // with AddYourCoolFeatureHere ...
 
     /* The access-control trait must be the last */
     with TequilaAuthentication {
 
   lazy val token = Properties
-      .envOrNone("EPFLBOT_TOKEN")
-      .getOrElse(Source.fromFile("token").getLines().mkString)
+    .envOrNone("EPFLBOT_TOKEN")
+    .getOrElse(Source.fromFile("token").getLines().mkString)
 
   override def routes: Route =
     super.routes ~

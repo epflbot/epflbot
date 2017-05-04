@@ -4,9 +4,9 @@ import java.time.format.DateTimeFormatter
 import sbt.Package.ManifestAttributes
 
 name := "EPFLBot"
-version := "0.1.0"
+version := "0.2.0"
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.2"
 
 scalacOptions ++= Seq(
   "-deprecation",

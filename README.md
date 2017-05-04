@@ -12,13 +12,13 @@ It runs in [privacy mode](https://core.telegram.org/bots#privacy-mode); only has
 
 ## Getting started
 
-With docker:
+With docker, this will launch Elasticsearch for the storage and Kibana to access it (slow to start, about 2 minutes):
 
 ```shell
 docker-compose up -d
 ```
 
-On Linux, if docker fails to spawn elasticsearch run ```sudo sysctl -w vm.max_map_count=262144```
+On Linux, if docker fails to spawn Elasticsearch run ```sudo sysctl -w vm.max_map_count=262144```.
 
 Standard setup:
 
@@ -28,11 +28,13 @@ sbt
 > ~re-start
 ```
 
-## Deploy
+## Production
+
+The bot uses [Traefik](https://github.com/containous/traefik) as reverse proxy to serve the showcase website and bind to some thirdparty integrations (e.g. Tequila).
 
 ```shell
 sbt clean assembly
 cp .env.example .env
 vim .env
-docker-compose up --build -f docker-compose-prod.yml
+docker-compose -f docker-compose-prod.yml up --build -d
 ```

@@ -1,6 +1,6 @@
 FROM java:8-jre-alpine
 
-COPY epflbot.jar /opt/
+COPY build/epflbot.jar /opt/
 
 RUN echo "Europe/Zurich" > /etc/timezone
 

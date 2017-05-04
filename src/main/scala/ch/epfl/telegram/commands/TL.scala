@@ -17,8 +17,7 @@ import scala.util.Try
 /**
   * Add TL (transport public Lausanne) useful commands.
   */
-trait TL extends Commands with Callbacks {
-  _ : TelegramBot =>
+trait TL extends Commands with Callbacks { _: TelegramBot =>
 
   private val TL_TAG = "TL_TAG"
 
@@ -27,7 +26,7 @@ trait TL extends Commands with Callbacks {
 
   val markup = {
     val renens = InlineKeyboardButton("Renens", callbackData = TL_TAG + "Renens")
-    val flon = InlineKeyboardButton("Lausanne-Flon", callbackData = TL_TAG + "Lausanne-Flon")
+    val flon   = InlineKeyboardButton("Lausanne-Flon", callbackData = TL_TAG + "Lausanne-Flon")
     InlineKeyboardMarkup(Seq(Seq(renens, flon)))
   }
 
@@ -63,20 +62,24 @@ trait TL extends Commands with Callbacks {
   def horairesMessage(destination: String): String = {
     val now = DateTime.now
 
-    val header = now.toString("HH:mm:ss") +  " " + "metro".emoji + " EPFL ➜ " + destination
+    val header = now.toString("HH:mm:ss") + " " + "metro".emoji + " EPFL ➜ " + destination
 
-    val text = TLScraper.horaires(destination).take(5).map { dt =>
-      val remaining = Minutes.minutesBetween(now, dt).getMinutes()
-      val s = dt.toString("HH:mm").bold + " "
+    val text = TLScraper
+      .horaires(destination)
+      .take(5)
+      .map { dt =>
+        val remaining = Minutes.minutesBetween(now, dt).getMinutes()
+        val s         = dt.toString("HH:mm").bold + " "
 
-      if (remaining <= RunningTime)
-        s + "running".emoji // Hurry up!
-      else if (remaining <= WalkingTime)
-        s + "walking".emoji
-      else
-        s
+        if (remaining <= RunningTime)
+          s + "running".emoji // Hurry up!
+        else if (remaining <= WalkingTime)
+          s + "walking".emoji
+        else
+          s
 
-    }.mkString("\n")
+      }
+      .mkString("\n")
 
     val departures = if (text.isEmpty) "No departures in the next ~3 hours." else text
     header + "\n\n" + departures
@@ -102,20 +105,21 @@ object TLScraper {
       "Renens"        -> "line_detail.php?id=3377704015495520&line=11821953316814882&id_stop=2535851770776450&id_direction=11821953316814882"
     )
 
-    directions.get(direction)
+    directions
+      .get(direction)
       .map(scrapDepartures(_))
       .getOrElse(Seq.empty)
   }
 
   private def scrapDepartures(path: String, depart: DateTime = DateTime.now): Seq[DateTime] = {
     val targetUrl = baseUrl + path +
-        s"&jour=${depart.getYear}/${depart.getMonthOfYear}/${depart.getDayOfMonth}" +
-        s"&heure=${depart.getHourOfDay}" +
-        s"&minute=${depart.getMinuteOfHour}"
+      s"&jour=${depart.getYear}/${depart.getMonthOfYear}/${depart.getDayOfMonth}" +
+      s"&heure=${depart.getHourOfDay}" +
+      s"&minute=${depart.getMinuteOfHour}"
 
     val doc = browser.get(targetUrl)
 
-    val Remaining = "(\\d+)'".r
+    val Remaining   = "(\\d+)'".r
     val HourMinutes = "(\\d+):(\\d+)".r
 
     val nextDepartures = doc >?> element("#lineDetailPage > div[data-role='content'] > div > ul")
