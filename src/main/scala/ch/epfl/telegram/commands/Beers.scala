@@ -1,5 +1,6 @@
 package ch.epfl.telegram.commands
 
+import ch.epfl.telegram.utils.Cachable
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}

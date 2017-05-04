@@ -24,6 +24,7 @@ object EpflBot
     with Menus
     with Room
     with About
+    with Beers
     // with AddYourCoolFeatureHere ...
 
     /* The access-control trait must be the last */
