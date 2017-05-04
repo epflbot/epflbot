@@ -73,18 +73,6 @@ trait Menus extends Commands with Callbacks { _ : TelegramBot =>
   }
 }
 
-trait Cachable[T] {
-
-  private var obj = Option.empty[T]
-
-  def setCached(obj: T): Unit = {
-    this.obj = Some(obj)
-  }
-
-  def cached: Option[T] =
-    obj
-}
-
 object Restos extends Cachable[List[Resto]] {
   val callbackPrefix = "menus1"
 
