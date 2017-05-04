@@ -18,7 +18,7 @@ With docker:
 docker-compose up -d
 ```
 
-On Linux, if docker fails to spawn elasticsearch run ```sudo sysctl -w vm.max_map_count=262144```
+On Linux, if docker fails to spawn elasticsearch run ```sudo sysctl -w vm.max_map_count=262144```.
 
 Standard setup:
 

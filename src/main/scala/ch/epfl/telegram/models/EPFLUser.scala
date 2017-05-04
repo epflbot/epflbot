@@ -13,8 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
                                telegramInfo: Option[TelegramInfo],
                                firstName: String,
                                name: String,
-                               displayName : String,
-                               employeeType : Option[String],
+                               displayName: String,
+                               employeeType: Option[String],
                                email: String,
                                gaspar: String,
                                where: String) {
@@ -22,7 +22,8 @@ import scala.concurrent.{ExecutionContext, Future}
   def sciper: Int = id
 
   def isAvailableOnTelegram: Boolean =
-    telegramInfo.map(_.username.isDefined)
+    telegramInfo
+      .map(_.username.isDefined)
       .getOrElse(false)
 }
 
@@ -52,8 +53,9 @@ object EPFLUser {
 
   def removeId(id: Int)(implicit ec: ExecutionContext): Future[Boolean] =
     es.execute {
-      delete(id) from epflUserIndex
-    }.map(_.status() == Result.DELETED)
+        delete(id) from epflUserIndex
+      }
+      .map(_.status() == Result.DELETED)
 
   def searchDirectory(userQuery: String)(implicit ec: ExecutionContext): Future[Seq[EPFLUser]] =
     es.execute {
@@ -73,8 +75,7 @@ object EPFLUser {
   def unlinkTelegramId(id: Int)(implicit ec: ExecutionContext): Future[Unit] = {
     for {
       epflUsers <- fromTelegramId(id)
-      u <- putUserSeq(epflUsers.map(_.copy(telegramInfo = None)))
-    } yield
-      u
+      u         <- putUserSeq(epflUsers.map(_.copy(telegramInfo = None)))
+    } yield u
   }
 }

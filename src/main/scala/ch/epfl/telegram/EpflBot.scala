@@ -11,7 +11,7 @@ import scala.io.Source
 import scala.util.Properties
 
 object EpflBot
-  extends App
+    extends App
     with WebTelegramBot
     with Polling
     with Commands

@@ -38,14 +38,14 @@ trait InlineEpflDirectory extends TelegramBot {
 
             val userBadge =
               "Profile: " + epflUser.displayName.altWithUrl(profileUrl) + "\n" +
-              "Email: " + epflUser.email + {
+                "Email: " + epflUser.email + {
 
                 val telegramLabel = for {
-                  ti <- epflUser.telegramInfo
+                  ti               <- epflUser.telegramInfo
                   telegramUsername <- ti.username
                 } yield
                   "\n\n" + s"Open chat with ${epflUser.firstName}"
-                      .altWithUrl(telegramChatWith(telegramUsername))
+                    .altWithUrl(telegramChatWith(telegramUsername))
 
                 telegramLabel.getOrElse("")
               }
@@ -60,14 +60,16 @@ trait InlineEpflDirectory extends TelegramBot {
               index.toString,
               fullTitle,
               InputTextMessageContent(
-                  userBadge,
-                  // TODO: Should use ParseMode.
-                  parseMode = "markdown",
-                  // Page preview just shows your (most likely fake) profile picture.
-                  disableWebPagePreview = true),
+                userBadge,
+                // TODO: Should use ParseMode.
+                parseMode = "markdown",
+                // Page preview just shows your (most likely fake) profile picture.
+                disableWebPagePreview = true
+              ),
               thumbUrl = photoUrl(epflUser.sciper),
               url = profileUrl,
-              description = epflUser.where)
+              description = epflUser.where
+            )
           }
 
       // TODO: Increase cacheTime in production.

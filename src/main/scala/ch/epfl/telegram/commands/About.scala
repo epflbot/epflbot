@@ -3,14 +3,13 @@ package ch.epfl.telegram.commands
 import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.ParseMode
 
-trait About extends Commands {
-  _: TelegramBot =>
+trait About extends Commands { _: TelegramBot =>
 
   on("/start", "welcome to @EPFLBot") { implicit msg =>
-  {
-    case Seq() =>
-      reply(
-        """
+    {
+      case Seq() =>
+        reply(
+          """
           |Welcome!
           |
           |This bot offers various EPFL-specific campus services to students and collaborators. It aims at providing interactive and social commands. Invite @EPFLBot into your favorite groups!
@@ -26,10 +25,10 @@ trait About extends Commands {
           |
           |Ping us for feedback and suggestions!
         """.stripMargin,
-        parseMode = Some(ParseMode.Markdown)
-      )
-    case _ => /* ignore */
-  }
+          parseMode = Some(ParseMode.Markdown)
+        )
+      case _ => /* ignore */
+    }
   }
 
   on("/version", "@EPFLBot version") { implicit msg => _ =>

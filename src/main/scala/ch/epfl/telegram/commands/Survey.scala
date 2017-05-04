@@ -85,11 +85,12 @@ trait Survey extends Commands with Callbacks { _: TelegramBot =>
           |Try something like:
           |*/feedback* A _/meme_ command would be awesome.
         """.stripMargin,
-      parseMode = ParseMode.Markdown)
+        parseMode = ParseMode.Markdown
+      )
     } else {
       for {
         user <- msg.from
-        _ <- Reaction.putFeedback(user.id, text)
+        _    <- Reaction.putFeedback(user.id, text)
       } {
         reply("Thanks for the comment!")
       }
@@ -103,7 +104,7 @@ object Survey {
   val callbackPrefix = "survey1"
 
   def nextQuestion(userId: Long, nextQuestionNumber: Option[Int] = None)(
-    implicit ec: ExecutionContext): Future[Option[(String, InlineKeyboardMarkup)]] = {
+      implicit ec: ExecutionContext): Future[Option[(String, InlineKeyboardMarkup)]] = {
 
     require(nextQuestionNumber.forall(_ >= 0), "next question number cannot have negative index")
     nextQuestionNumber match {

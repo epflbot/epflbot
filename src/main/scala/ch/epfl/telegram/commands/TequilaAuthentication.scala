@@ -59,15 +59,16 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
       case Seq("success") =>
         // Greet the user
         for {
-          user <- msg.from
+          user           <- msg.from
           linkedAccounts <- EPFLUser.fromTelegramId(user.id)
         } /* do */ {
           if (linkedAccounts.nonEmpty)
             reply(
-               s"Hi, ${user.firstName}!\n" +
+              s"Hi, ${user.firstName}!\n" +
                 "You are successfully authenticated with your EPFL account.\n" +
                 "@EPFLBot DO NOT store any sensible information such as passwords or personal data.",
-                replyMarkup = ReplyKeyboardRemove())
+              replyMarkup = ReplyKeyboardRemove()
+            )
           else
             reply("Your /login attempt failed.")
         }
@@ -91,18 +92,19 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
 
   on("/status", "shows authentication status") { implicit msg => _ =>
     for {
-      user <- msg.from
+      user           <- msg.from
       linkedAccounts <- EPFLUser.fromTelegramId(user.id)
     } /* do */ {
       if (linkedAccounts.isEmpty)
-        reply("You have no EPFL account linked.\n"+
-              "Please /login first.")
+        reply(
+          "You have no EPFL account linked.\n" +
+            "Please /login first.")
       else {
         val desc = for (account <- linkedAccounts)
-          yield
-            account.email
-        reply("You have linked the following EPFL account(s):\n" +
-              desc.mkString("\n"))
+          yield account.email
+        reply(
+          "You have linked the following EPFL account(s):\n" +
+            desc.mkString("\n"))
       }
     }
   }
@@ -122,10 +124,10 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
         // TODO: Report to Telegram support
         request(
           AnswerInlineQuery(inlineQuery.id,
-            cacheTime = 1,
-            switchPmText = "Link your EPFL account!",
-            results = Seq.empty,
-            switchPmParameter = "login")
+                            cacheTime = 1,
+                            switchPmText = "Link your EPFL account!",
+                            results = Seq.empty,
+                            switchPmParameter = "login")
         )
       }
     }
@@ -228,7 +230,7 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
           val data = tequilaDeserialize(res)
 
           val telegramInfoOpt = tequilaToken.synchronized { tequilaToken.get(key) }
-          val sciper = data("uniqueid").toInt
+          val sciper          = data("uniqueid").toInt
 
           val updateTelegramInfo =
             for (telegramInfo <- telegramInfoOpt) yield {
