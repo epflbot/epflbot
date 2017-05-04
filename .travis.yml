@@ -10,7 +10,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean compile test scalafmtTest
+  - sbt ++$TRAVIS_SCALA_VERSION clean compile test clean scalafmtTest
 
 cache:
   directories:
