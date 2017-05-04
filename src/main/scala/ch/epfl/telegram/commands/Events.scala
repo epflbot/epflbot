@@ -108,7 +108,7 @@ object EventsScraper {
     val exportUrl = infosElem >> attr("href")("a")  // TODO not useful if only events of the day....
     // Time
     val times = (infosElem >> text(".hour")).split("-").toList
-    val startTime = times.headOption.getOrElse("00:00")  // not really used, (seems to be always already part of startDate)
+    //val startTime = times.headOption.getOrElse("00:00")  // not really used, (seems to be always already part of startDate)
     val endTime = times.tail.headOption.getOrElse("23:59")  // on the other hand the endTime is not part of the endDate
     val (endHour, endMin) = (endTime.substring(0, 2).toInt, endTime.substring(3).toInt)
 

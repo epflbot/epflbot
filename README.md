@@ -28,11 +28,13 @@ sbt
 > ~re-start
 ```
 
-## Deploy
+## Production
+
+The bot uses [Traefik](https://github.com/containous/traefik) as reverse proxy to serve the showcase website and bind to some thirdparty integrations (e.g. Tequila).
 
 ```shell
 sbt clean assembly
 cp .env.example .env
 vim .env
-docker-compose up --build -f docker-compose-prod.yml
+docker-compose -f docker-compose-prod.yml up --build -d
 ```

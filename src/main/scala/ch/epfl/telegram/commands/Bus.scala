@@ -7,10 +7,10 @@ import info.mukel.telegrambot4s.api.{Callbacks, Commands, TelegramBot}
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
 import info.mukel.telegrambot4s.models.{InlineKeyboardButton, InlineKeyboardMarkup}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
-import net.ruippeixotog.scalascraper.scraper.ContentExtractors.{element, elements}
-import org.joda.time.{DateTime, Minutes}
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL._
+import net.ruippeixotog.scalascraper.scraper.ContentExtractors.{element, elements}
+import org.joda.time.DateTime
 
 /**
   * Add bus (Transport Region Morges) useful commands.
@@ -28,10 +28,10 @@ trait Bus extends Commands with Callbacks {
   val supportedBuses = Seq(701, 705)
 
   val busCode = Map(701 -> Map("Morges − Echichens" -> 711, "Bourdonnette" -> 683),
-                    705 -> Map("Lonay" -> 717, "Piccard" -> 716))
+    705 -> Map("Lonay" -> 717, "Piccard" -> 716))
 
   val busSrcDest = Map (701 -> (("Morges − Echichens", "Bourdonnette")),
-                        705 -> (("Lonay", "Piccard")))
+    705 -> (("Lonay", "Piccard")))
 
   val epflStops = Map(701 -> "Parc Scient.", 705 -> "EPFL")
 
@@ -86,7 +86,7 @@ trait Bus extends Commands with Callbacks {
     val now = DateTime.now
 
     val header = now.toString("HH:mm:ss") +  " " + "bus".emoji + " Bus: " + busNumber +
-                "\nEPFL ➜ " + destination
+      "\nEPFL ➜ " + destination
 
     val code = busCode(busNumber)(destination)
     val stopName = epflStops(busNumber)
@@ -117,14 +117,14 @@ object BusScraper {
 
   def scrapDepartures(dir: Int, stopName : String): Seq[Int] = {
 
-   val doc = browser.get(baseUrl + dir)
+    val doc = browser.get(baseUrl + dir)
 
     val Remaining = "~?(\\d+)'".r
 
     val nextDepartures = doc >> element(".table > tbody:nth-child(1)")
 
     val t = for (tb <- nextDepartures >> elements("> tr"))
-     yield tb.flatMap(_ >> texts("> td")) filter (x => !x.isEmpty)
+      yield tb.flatMap(_ >> texts("> td")) filter (x => !x.isEmpty)
 
     val departures = t.filter(x => x.head == stopName).flatMap(t => t.tail)
 
