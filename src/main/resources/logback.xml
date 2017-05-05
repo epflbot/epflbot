@@ -8,7 +8,7 @@
         </encoder>
     </appender>
     <appender name="ELASTIC" class="com.internetitem.logback.elasticsearch.ElasticsearchAppender">
-        <url>http://${EPFLBOT_ELASTICSEARCH_INTERFACE:-localhost}:9200/_bulk</url>
+        <url>http://${EPFLBOT_ELASTICSEARCH_HOST:-localhost}:9200/_bulk</url>
         <index>logs-%date{yyyy.MM.dd}</index>
         <type>logs</type>
         <errorLoggerName>es-error-logger</errorLoggerName>
