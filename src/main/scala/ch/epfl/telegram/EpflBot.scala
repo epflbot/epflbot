@@ -41,7 +41,7 @@ object EpflBot
       } ~
       getFromResourceDirectory("static")
 
-  val bind = Http().bindAndHandle(routes, "::0", Config.http.port)
+  val bind = Http().bindAndHandle(routes, "0.0.0.0", Config.http.port)
   bind.foreach { _ =>
     logger.info("EPFL bot just started.")
   }

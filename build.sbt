@@ -25,10 +25,10 @@ resolvers += Resolver.typesafeIvyRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 libraryDependencies ++= {
-  val elasticV = "5.3.2"
+  val elasticV = "5.4.2"
 
   Seq(
-    "info.mukel"                 %% "telegrambot4s"                 % "2.2.1-SNAPSHOT",
+    "info.mukel"                 %% "telegrambot4s"                 % "2.2.4-SNAPSHOT",
     "net.ruippeixotog"           %% "scala-scraper"                 % "1.2.1",
     "com.github.nscala-time"     %% "nscala-time"                   % "2.16.0",
     "com.sksamuel.elastic4s"     %% "elastic4s-core"                % elasticV,

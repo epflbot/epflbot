@@ -180,7 +180,7 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
     val port      = Config.http.port
 
     val params = Map(
-      "urlaccess" -> s"http://$interface:$port/$tokenUri",
+      "urlaccess" -> s"$interface:$port/$tokenUri",
       "service"   -> Config.tequila.service,
       "request"   -> Config.tequila.request,
       "require"   -> Config.tequila.require,
