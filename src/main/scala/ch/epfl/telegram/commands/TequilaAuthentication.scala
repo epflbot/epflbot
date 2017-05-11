@@ -135,7 +135,7 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
 
   def startLogin(implicit msg: Message): Unit = {
     for (user <- msg.from) {
-      if (msg.chat.`type` != "private") {
+      if (msg.chat.`type` != ChatType.Private) {
         val privateChatUrl = deepLink("login").toString()
         val button         = InlineKeyboardMarkup(Seq(Seq(InlineKeyboardButton("Let's do it!", url = privateChatUrl))))
 
