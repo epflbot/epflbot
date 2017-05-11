@@ -3,7 +3,7 @@ package ch.epfl.telegram.commands
 import ch.epfl.telegram.models.EPFLUser
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.TelegramBot
-import info.mukel.telegrambot4s.methods.AnswerInlineQuery
+import info.mukel.telegrambot4s.methods.{AnswerInlineQuery, ParseMode}
 import info.mukel.telegrambot4s.models._
 
 /**
@@ -61,8 +61,7 @@ trait InlineEpflDirectory extends TelegramBot {
               fullTitle,
               InputTextMessageContent(
                 userBadge,
-                // TODO: Should use ParseMode.
-                parseMode = "markdown",
+                parseMode = ParseMode.Markdown,
                 // Page preview just shows your (most likely fake) profile picture.
                 disableWebPagePreview = true
               ),
