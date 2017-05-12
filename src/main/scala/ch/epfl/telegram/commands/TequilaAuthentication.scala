@@ -8,10 +8,10 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.unmarshalling.PredefinedFromEntityUnmarshallers._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import ch.epfl.telegram.Config
 import ch.epfl.telegram.models.{EPFLUser, TelegramInfo}
-import ch.epfl.telegram.{Config, WebTelegramBot}
 import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.api.Commands
+import info.mukel.telegrambot4s.api.{Commands, TelegramBot, WebRoutes}
 import info.mukel.telegrambot4s.methods.{AnswerInlineQuery, GetMe}
 import info.mukel.telegrambot4s.models._
 
@@ -40,7 +40,8 @@ import scala.language.postfixOps
   * If the authentication succeeds, the user will be redirected to the "?start=success" sub-command
   * to confirm that the login was successful.
   */
-trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegramBot =>
+trait TequilaAuthentication extends WebRoutes with Commands {
+  _: TelegramBot =>
 
   val tequilaToken = scala.collection.mutable.Map[String, TelegramInfo]() // request_token -> telegram_user_info
 
@@ -177,7 +178,7 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
 
   private val createRequestParams = {
     val interface = Config.http.interface
-    val port      = Config.http.port
+    val port      = Config.tequila.tequilaRedirectPort
 
     val params = Map(
       "urlaccess" -> s"$interface:$port/$tokenUri",
@@ -220,7 +221,9 @@ trait TequilaAuthentication extends WebTelegramBot with Commands { _: WebTelegra
       }
       .toMap
 
-  override abstract def routes: Route = super.routes ~ {
+  import akka.http.scaladsl.server.Directives._
+
+  override def routes: Route = super.routes ~ {
     pathPrefix(tokenUri) {
       parameters("key") { key =>
         val redirection = for {
