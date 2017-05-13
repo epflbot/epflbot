@@ -97,7 +97,6 @@ object Restos extends Cachable[List[Resto]] {
 
 // TODO share similar code between menus and events => trait scrapper
 object MenusScraper {
-  val browser = JsoupBrowser()
   val baseUrl = "https://menus.epfl.ch/cgi-bin/getMenus"
 
   private def parseMenu(menuDiv: Element): Menu = {
@@ -113,7 +112,7 @@ object MenusScraper {
   }
 
   def retrieveMenus(): List[Menu] = {
-    val doc = browser.get(baseUrl)
+    val doc = JsoupBrowser().get(baseUrl)
     doc >?> elementList("#menulist li") match {
       case Some(menusDivs) => {
         menusDivs.map(parseMenu(_)).filter(_.isValidToShow())

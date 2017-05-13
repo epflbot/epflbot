@@ -90,8 +90,6 @@ trait TL extends Commands with Callbacks { _: TelegramBot =>
   * TODO: Use https://github.com/RemembrMoe/tl-api
   */
 object TLScraper {
-  val browser = JsoupBrowser()
-
   val baseUrl = "http://www.t-l.ch/tl-live-mobile/"
 
   /**
@@ -117,7 +115,7 @@ object TLScraper {
       s"&heure=${depart.getHourOfDay}" +
       s"&minute=${depart.getMinuteOfHour}"
 
-    val doc = browser.get(targetUrl)
+    val doc = JsoupBrowser().get(targetUrl)
 
     val Remaining   = "(\\d+)'".r
     val HourMinutes = "(\\d+):(\\d+)".r

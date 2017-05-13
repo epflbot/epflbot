@@ -115,13 +115,12 @@ trait Bus extends Commands with Callbacks { _: TelegramBot =>
   * Scrap transport region Morges
   */
 object BusScraper {
-  val browser = JsoupBrowser()
 
   val baseUrl = "https://mbc.ch/?post_type=ligne&p="
 
   def scrapDepartures(dir: Int, stopName: String): Seq[Int] = {
 
-    val doc = browser.get(baseUrl + dir)
+    val doc = JsoupBrowser().get(baseUrl + dir)
 
     val Remaining = "~?(\\d+)'".r
 
