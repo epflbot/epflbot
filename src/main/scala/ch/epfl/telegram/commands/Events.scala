@@ -98,7 +98,6 @@ object Events {
 }
 
 object EventsScraper {
-  private val browser = JsoupBrowser()
   private val baseUrl = "http://memento.epfl.ch/"
 
   private def parseEvent(eventDiv: Element): Event = {
@@ -136,7 +135,7 @@ object EventsScraper {
   }
 
   def retrieveEvents(category: String, period: Int): List[Event] = {
-    val doc = browser.get(baseUrl + category + "&period=" + period)
+    val doc = JsoupBrowser().get(baseUrl + category + "&period=" + period)
     doc >?> elementList(".media.event") match {
       case Some(eventDivs) => eventDivs.map(parseEvent(_)).filter(_.isValidToShow())
       case None            => Nil

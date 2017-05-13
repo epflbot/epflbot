@@ -1,21 +1,22 @@
 package ch.epfl.telegram
 
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Route
 import ch.epfl.telegram.commands._
+import ch.epfl.telegram.utils.AsyncUpdates
 import info.mukel.telegrambot4s.api._
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 import scala.io.Source
 import scala.util.Properties
 
 object EpflBot
     extends App
-    with WebTelegramBot
+    // Bot skeleton
+    with TelegramBot
     with Polling
+    with WebRoutes
     with Commands
     with ChatActions
+
+    // EPFLBot extensions
     with TL
     with Bus
     with Survey
@@ -25,35 +26,17 @@ object EpflBot
     with Room
     with About
     with Beers
+    with Microsite
     // with AddYourCoolFeatureHere ...
 
-    /* The access-control trait must be the last */
-    with TequilaAuthentication {
+    /* The access-control trait must be last */
+    with TequilaAuthentication
+    /* All updates are processed asynchronously */
+    with AsyncUpdates {
 
   lazy val token = Properties
     .envOrNone("EPFLBOT_TOKEN")
     .getOrElse(Source.fromFile("token").getLines().mkString)
 
-  override def routes: Route =
-    super.routes ~
-      pathEndOrSingleSlash {
-        getFromResource("static/index.html")
-      } ~
-      getFromResourceDirectory("static")
-
-  val bind = Http().bindAndHandle(routes, "0.0.0.0", Config.http.port)
-  bind.foreach { _ =>
-    logger.info("EPFL bot just started.")
-  }
-
-  sys.addShutdownHook {
-    val stops = List(
-      bind.flatMap(_.unbind()),
-      system.terminate()
-    )
-    Await.ready(Future.sequence(stops), 30.seconds)
-  }
-
   run()
-
 }

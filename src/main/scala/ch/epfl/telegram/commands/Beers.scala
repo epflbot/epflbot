@@ -97,7 +97,6 @@ object Sat extends Cachable[Satellite] {
 }
 
 object SatScraper {
-  val browser = JsoupBrowser()
   val baseUrl = "https://satellite.bar/bar/biere.php"
   val categories = Map("pression" -> "drafts",
                        "mois_pression"    -> "draft(s) of the month",
@@ -106,7 +105,7 @@ object SatScraper {
   // FIXME paginate long messages ex: bouteilles is even too long to be embeded in a single message => too long exception
 
   private def parseBeer(beerLink: Element): Beer = {
-    implicit val doc = browser.get(baseUrl + beerLink.attr("href"))
+    implicit val doc = JsoupBrowser().get(baseUrl + beerLink.attr("href"))
 
     def retrieveText(cssSelector: String)(implicit doc: Document): Option[String] =
       doc >?> element(cssSelector) map (elem => elem.text)
@@ -131,7 +130,7 @@ object SatScraper {
   def parseSat(): Satellite = {
     val items = categories.map {
       case (cat, name) =>
-        val doc = browser.get(baseUrl + "?type_biere=" + cat)
+        val doc = JsoupBrowser().get(baseUrl + "?type_biere=" + cat)
         val beers = doc >?> elementList("p.center ~ p a.int_link") match {
           case Some(beerLinks) => {
             beerLinks.map(parseBeer(_)).filter(_.isValidToShow())
