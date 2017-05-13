@@ -40,8 +40,7 @@ import scala.language.postfixOps
   * If the authentication succeeds, the user will be redirected to the "?start=success" sub-command
   * to confirm that the login was successful.
   */
-trait TequilaAuthentication extends WebRoutes with Commands {
-  _: TelegramBot =>
+trait TequilaAuthentication extends WebRoutes with Commands { _: TelegramBot =>
 
   val tequilaToken = scala.collection.mutable.Map[String, TelegramInfo]() // request_token -> telegram_user_info
 
