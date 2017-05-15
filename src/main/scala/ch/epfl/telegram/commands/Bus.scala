@@ -4,6 +4,7 @@ import com.lightbend.emoji.ShortCodes.Defaults._
 import com.lightbend.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits.Extractor
 import info.mukel.telegrambot4s.api.{Callbacks, Commands, TelegramBot}
+import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
 import info.mukel.telegrambot4s.models.{InlineKeyboardButton, InlineKeyboardMarkup}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
@@ -38,13 +39,17 @@ trait Bus extends Commands with Callbacks { _: TelegramBot =>
     */
   on("/bus", "interactive 701 and 705 bus schedule") { implicit msg =>
     {
-
       case Seq(Extractor.Int(busNumber)) if supportedBuses contains busNumber =>
         reply(horairesMessage(busNumber, busCode(busNumber).head._1),
               parseMode = Some(ParseMode.Markdown),
               replyMarkup = Some(markup(busNumber)))
 
-      case _ => reply("Invalid syntax. Try '/bus 701'")
+      case _ =>
+        val buttons = supportedBuses.map { b =>
+          InlineKeyboardButton("oncoming_bus".emoji + " " + b, callbackData = tag(b + "#" + busSrcDest(b)._1))
+        }
+
+        reply("Pick your bus", replyMarkup = InlineKeyboardMarkup(Seq(buttons)))
     }
   }
 
@@ -62,11 +67,11 @@ trait Bus extends Commands with Callbacks { _: TelegramBot =>
       if (Option(text) != msg.text)
         request(
           EditMessageText(
-            Some(Left(msg.chat.id)),
-            Some(msg.messageId),
+            msg.chat.id,
+            msg.messageId,
             text = text,
-            parseMode = Some(ParseMode.Markdown),
-            replyMarkup = Some(markup(busNumber))
+            parseMode = ParseMode.Markdown,
+            replyMarkup = markup(busNumber)
           )
         )
     }
@@ -74,8 +79,8 @@ trait Bus extends Commands with Callbacks { _: TelegramBot =>
   }
 
   def markup(busNumber: Int): InlineKeyboardMarkup = {
-    val source = InlineKeyboardButton(busSrcDest(busNumber)._1,
-                                      callbackData = Some(tag(busNumber + "#" + busSrcDest(busNumber)._1)))
+    val source =
+      InlineKeyboardButton(busSrcDest(busNumber)._1, callbackData = tag(busNumber + "#" + busSrcDest(busNumber)._1))
 
     val dest = InlineKeyboardButton(busSrcDest(busNumber)._2,
                                     callbackData = Some(tag(busNumber + "#" + busSrcDest(busNumber)._2)))
