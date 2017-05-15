@@ -9,78 +9,79 @@
 .subheading * {
 	font-family: 'Varela Round', serif;
 }.footer,
-.header {
-	background: radial-gradient(ellipse farthest-side at 100% 100%, #c6efa9 20%, #26c2db 50%, #0731a7 110%);
-	color: white;
-}@import url('https://fonts.googleapis.com/css?family=Karla:400,700');
+ .header {
+	 background: radial-gradient(ellipse farthest-side at 100% 100%, #c6efa9 20%, #26c2db 50%, #0731a7 110%);
+	 color: white;
+ }@import url('https://fonts.googleapis.com/css?family=Karla:400,700');
 *,
 *:before,
 *:after {
-  margin: 0;
-  box-sizing: border-box;
+	margin: 0;
+	box-sizing: border-box;
 }
 body {
-  -webkit-font-smoothing: antialiased;
+	-webkit-font-smoothing: antialiased;
 }
 /*text*/
 .heading {
-  font-weight: 100;
-  font-size: 50px;
-  line-height: 68px;
+	font-weight: 100;
+	font-size: 50px;
+	line-height: 68px;
+	text-align: center;
 }
 @media (max-width: 900px) {
-.heading {
-    font-size: 32px;
-    line-height: 40px;
-  }
+	.heading {
+		font-size: 32px;
+		line-height: 40px;
+	}
 }
 .subheading {
-  font-size: 30px;
-  line-height: 40px;
-  font-weight: 500;
+	font-size: 30px;
+	line-height: 40px;
+	font-weight: 500;
 }
 @media (max-width: 900px) {
-  .subheading {
-    font-size: 26px;
-    line-height: 35px;
-  }
+	.subheading {
+		font-size: 26px;
+		line-height: 35px;
+	}
 }
 .paragraph {
-  font-size: 17px;
-  line-height: 32px;
-  font-weight: 100;
+	font-size: 17px;
+	line-height: 32px;
+	font-weight: 100;
 }
 .heading + .paragraph {
-  margin-top: 30px;
+	margin-top: 30px;
 }
 .subheading + .paragraph {
-  margin-top: 10px;
+	margin-top: 10px;
 }
 .logo {
-  font-size: 30px;
-  line-height: 30px;
-  font-weight: 900;
+	font-size: 30px;
+	line-height: 30px;
+	font-weight: 900;
 }
 @media (max-width: 420px) {
-  .logo {
-    font-size: 22px;
-  }
+	.logo {
+		font-size: 22px;
+	}
 }
 .nav-link2,
 .nav-link {
-  text-decoration: none;
-  font-size: 18px;
-  line-height: 30px;
-  color: inherit;
+	text-decoration: none;
+	font-size: 18px;
+	line-height: 30px;
+	color: inherit;
 }
 .nav-link:not(:first-of-type) {
-  margin-left: 20px;
+	margin-left: 20px;
 }
 .text-center {
-  text-align: center;
+	text-align: center;
 }
 .text-right {
-  text-align: right;
+	text-align: right;
 }
 /*flexbox styles*/
 .flex,
@@ -89,24 +90,24 @@ body {
 .right,
 .vertical,
 .centervertical {
-  display: flex;
+	display: flex;
 }
 .spread {
-  justify-content: space-between;
+	justify-content: space-between;
 }
 .center {
-  align-items: center;
-  justify-content: center;
+	align-items: center;
+	justify-content: center;
 }
 .centervertical {
-  flex-direction: column;
-  justify-content: center;
+	flex-direction: column;
+	justify-content: center;
 }
 .right {
-  justify-content: flex-end;
+	justify-content: flex-end;
 }
 .vertical {
-  flex-direction: column;
+	flex-direction: column;
 }
 /*grid*/
 .col-1,
@@ -121,7 +122,7 @@ body {
 .col-10,
 .col-11,
 .col-12 {
-  padding: 0 20px;
+	padding: 0 20px;
 }
 .col-1 {width: 8.333333%;}
 .col-2 {width: 16.666667%;}
@@ -139,25 +140,25 @@ body {
 /*containers*/
 .container-lrg,
 .container-sml {
-  margin: auto;
-  width: 100%;
+	margin: auto;
+	width: 100%;
 }
 .container-lrg {
-  max-width: 1080px;
+	max-width: 1080px;
 }
 .container-sml {
-  max-width: 700px;
+	max-width: 700px;
 }
 .ctas {
-  margin: 40px 0 0 0;
+	margin: 40px 0 0 0;
 }
 .centerdevices,
 .sidedevices {
-  position: relative;
+	position: relative;
 }.header {
-	padding: 20px 0 90px 0;
-	overflow: hidden;
-}
+	 padding: 20px 0 90px 0;
+	 overflow: hidden;
+ }
 .header .heading {
 	margin: 120px 0 0 0;
 }
@@ -174,7 +175,7 @@ body {
 	.header .paragraph {
 		margin-top: 30px;
 		text-align: center;
-		}
+	}
 	.header .ctas {
 		text-align: center;
 	}
@@ -185,16 +186,16 @@ body {
 		margin: 90px 0 0;
 	}
 }.ctas-input {
-	outline: none;
-	border: none;
-	border-radius: 3px;
-	font-size: 15px;
-	height: 40px;
-	line-height: 40px;
-	padding: 0 15px;
-	width: 260px;
-	display: inline-block;
-}
+	 outline: none;
+	 border: none;
+	 border-radius: 3px;
+	 font-size: 15px;
+	 height: 40px;
+	 line-height: 40px;
+	 padding: 0 15px;
+	 width: 260px;
+	 display: inline-block;
+ }
 .ctas-button {
 	display: inline-block;
 	margin: 0 0 0 10px;
@@ -221,22 +222,22 @@ body {
 		margin: 10px 0 0 0;
 	}
 }.socialproof {
-	padding: 90px 0;
-}.ctas-button,
-.ctas-button-2 {
-	display: inline-block;
-	height: 40px;
-	line-height: 38px;
-	padding: 0 30px;
-	background: #fff;
-	border-radius: 3px;
-	font-size: 15px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: .3px;
-	border: 1px solid white;
-	text-decoration: none;
-}
+	 padding: 90px 0;
+ }.ctas-button,
+  .ctas-button-2 {
+	  display: inline-block;
+	  height: 40px;
+	  line-height: 38px;
+	  padding: 0 30px;
+	  background: #fff;
+	  border-radius: 3px;
+	  font-size: 15px;
+	  font-weight: 600;
+	  text-transform: uppercase;
+	  letter-spacing: .3px;
+	  border: 1px solid white;
+	  text-decoration: none;
+  }
 .ctas-button-2 {
 	background: transparent;
 	color: white;
@@ -253,26 +254,26 @@ body {
 		margin: 10px 0 0 0;
 	}
 }.footer {
-	padding: 90px 0 45px;
-}
+	 padding: 90px 0 45px;
+ }
 .footer-nav {
 	padding-top: 90px;
 }.ctas-button {
-	display: inline-block;
-	height: 40px;
-	line-height: 38px;
-	padding: 0 30px;
-	background: #fff;
-	border-radius: 3px;
-	font-size: 15px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: .3px;
-	border: 1px solid white;
-	text-decoration: none;
-}.feature2 {
-	border-bottom: 1px solid rgba(0,0,0,.1);
-}
+	 display: inline-block;
+	 height: 40px;
+	 line-height: 38px;
+	 padding: 0 30px;
+	 background: #fff;
+	 border-radius: 3px;
+	 font-size: 15px;
+	 font-weight: 600;
+	 text-transform: uppercase;
+	 letter-spacing: .3px;
+	 border: 1px solid white;
+	 text-decoration: none;
+ }.feature2 {
+	  border-bottom: 1px solid rgba(0,0,0,.1);
+  }
 .feature2	.col-6:nth-of-type(2n - 1) {
 	padding: 90px 90px 90px 20px;
 	border-right: 1px solid rgba(0,0,0,.1)
@@ -286,8 +287,8 @@ body {
 }
 @media (max-width: 900px) {
 	.feature2 .emoji {
-    font-size: 40px;
-  }
+		font-size: 40px;
+	}
 	.feature2	.col-6:nth-of-type(1) {
 		padding: 45px 45px 45px 20px;
 	}
@@ -312,9 +313,9 @@ body {
 		margin-top: 30px;
 	}
 }.feature6 {
-	padding: 90px 0;
-	border-bottom: 1px solid rgba(0,0,0,.1)
-}.feature6 {
-	padding: 90px 0;
-	border-bottom: 1px solid rgba(0,0,0,.1)
-}
+	 padding: 90px 0;
+	 border-bottom: 1px solid rgba(0,0,0,.1)
+ }.feature6 {
+	  padding: 90px 0;
+	  border-bottom: 1px solid rgba(0,0,0,.1)
+  }
