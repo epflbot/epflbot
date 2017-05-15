@@ -25,7 +25,7 @@ resolvers += Resolver.typesafeIvyRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 libraryDependencies ++= {
-  val elasticV = "5.4.2"
+  val elasticV = "5.4.3"
 
   Seq(
     "info.mukel"                 %% "telegrambot4s"                 % "2.2.7-SNAPSHOT",
