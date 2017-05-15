@@ -1,6 +1,8 @@
 package ch.epfl.telegram.commands
 
 import ch.epfl.telegram.utils.Cachable
+import com.lightbend.emoji.ShortCodes.Defaults._
+import com.lightbend.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
@@ -86,9 +88,10 @@ trait Beers extends Commands with Callbacks { _: TelegramBot =>
 object Sat extends Cachable[Satellite] {
   val callbackPrefix = "satellite1"
 
-  val closeButton = InlineKeyboardButton("close", callbackData = callbackPrefix + "close")
-  val randButton  = InlineKeyboardButton("*random*", callbackData = callbackPrefix + "random")
-  val backButton  = InlineKeyboardButton("back", callbackData = callbackPrefix + "back")
+  val closeButton = InlineKeyboardButton("❌ Close", callbackData = callbackPrefix + "close")
+  val randButton =
+    InlineKeyboardButton("game_die".emoji + " Random " + "beer".emoji, callbackData = callbackPrefix + "random")
+  val backButton = InlineKeyboardButton("back".emoji + " Back", callbackData = callbackPrefix + "back")
 
   def getMenuKeyboard(): InlineKeyboardMarkup =
     InlineKeyboardMarkup((cached.get.items.keys.map { cat =>
@@ -98,10 +101,12 @@ object Sat extends Cachable[Satellite] {
 
 object SatScraper {
   val baseUrl = "https://satellite.bar/bar/biere.php"
-  val categories = Map("pression" -> "drafts",
-                       "mois_pression"    -> "draft(s) of the month",
-                       "mois_bouteille"   -> "bottled beer(s) of the month",
-                       "grande_bouteille" -> "big bottles") //, "bouteille" -> "bottles")
+  val categories = Map(
+    "pression"         -> ("beers".emoji + " Beers"),
+    "mois_pression"    -> ("beer".emoji + " of the month"),
+    "mois_bouteille"   -> ("\uD83C\uDF7E " + "beer".emoji + " of the month"),
+    "grande_bouteille" -> "\uD83C\uDF7E Big bottles"
+  ) //, "bouteille" -> "bottles")
   // FIXME paginate long messages ex: bouteilles is even too long to be embeded in a single message => too long exception
 
   private def parseBeer(beerLink: Element): Beer = {
@@ -167,6 +172,6 @@ case class Satellite(items: Map[String, List[Beer]]) {
   def randomBeer(): Beer = Random.shuffle(items.values.flatten).head
 
   override def toString(): String = {
-    "beers @ sat (/beers) !!\n"
+    "Checked /beers @ Satellite !!!"
   }
 }
