@@ -39,11 +39,10 @@ object EpflBot
     .envOrNone("EPFLBOT_TOKEN")
     .getOrElse(Source.fromFile("token").getLines().mkString)
 
-  system.scheduler.schedule(
-    initialDelay = 1.minute, // Give enough time to spawn docker, create indices...
-    interval = 1.day,
-    runnable = () => LDAP.refreshDirectory()
-  )
+  // Give enough time to spawn docker, create indices..
+  system.scheduler.schedule(initialDelay = 1.minute, interval = 1.day) {
+    LDAP.refreshDirectory()
+  }
 
   run()
 }
