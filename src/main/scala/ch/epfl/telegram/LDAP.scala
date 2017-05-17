@@ -2,20 +2,17 @@ package ch.epfl.telegram
 
 import ch.epfl.telegram.models.EPFLUser
 import com.typesafe.scalalogging.Logger
-import com.unboundid.ldap.sdk._
-import com.unboundid.ldap.sdk.SearchScope
+import com.unboundid.ldap.sdk.{SearchScope, _}
 
-import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 import scala.util.control.NonFatal
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 
 /**
   * Populates the 'user / epfl' index mirroring the whole EPFL directory.
-  * Login information (linked accounts) will be lost.
+  * Login information (linked accounts) will be preserved.
   */
-object LDAP extends App {
+object LDAP {
 
   val logger = Logger(getClass)
 
@@ -64,8 +61,17 @@ object LDAP extends App {
     ).toOption
   }
 
-  val entries = scrap("(employeeType=*)")
-  val users   = entries.flatMap(x => toEPFLUser(x))
-  logger.debug("Inserting " + users.size + " EPFL users...")
-  Await.result(EPFLUser.putUserSeq(users), 1.minute)
+  /**
+    * Only updates current users and add new ones.
+    * It doesn't remove users that not found on LDAP.
+    */
+  def refreshDirectory(): Unit = {
+    logger.debug("Scrapping LDAP, this may take up to 1 minute.")
+    val entries = scrap("(employeeType=*)")
+    logger.debug("LDAP scrapping finished.")
+
+    val freshUsers = entries.flatMap(x => toEPFLUser(x))
+    logger.debug("Updating " + freshUsers.size + " users")
+    EPFLUser.updateUserSeq(freshUsers)
+  }
 }

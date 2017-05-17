@@ -27,22 +27,46 @@ import scala.concurrent.{ExecutionContext, Future}
       .getOrElse(false)
 }
 
+/**
+  * Put* operations will completely wipe existing data (same effect as delete and then insert)
+  * Update* operations will refresh existing data (upsert).
+  */
 object EPFLUser {
 
   val epflUserIndex = "user" / "epfl"
 
-  def putUser(user: EPFLUser)(implicit ec: ExecutionContext): Future[Unit] =
+  def putUser(user: EPFLUser)(implicit ec: ExecutionContext): Future[Unit] = {
+
     es.execute {
       update(user.id) in epflUserIndex docAsUpsert user
     } map (_ => ())
+  }
 
-  def putUserSeq(users: Seq[EPFLUser])(implicit ec: ExecutionContext): Future[Unit] =
+  def updateUser(user: EPFLUser)(implicit ec: ExecutionContext): Future[Unit] = {
+    import ch.epfl.telegram.models.dropNulls._
+    es.execute {
+      update(user.id) in epflUserIndex docAsUpsert user
+    } map (_ => ())
+  }
+
+  def putUserSeq(users: Seq[EPFLUser])(implicit ec: ExecutionContext): Future[Unit] = {
     es.execute {
       bulk(
         for (user <- users)
           yield update(user.sciper) in epflUserIndex docAsUpsert user
       )
     } map (_ => ())
+  }
+
+  def updateUserSeq(users: Seq[EPFLUser])(implicit ec: ExecutionContext): Future[Unit] = {
+    import ch.epfl.telegram.models.dropNulls._
+    es.execute {
+      bulk(
+        for (user <- users)
+          yield update(user.sciper) in epflUserIndex docAsUpsert user
+      )
+    } map (_ => ())
+  }
 
   def fromId(id: Int)(implicit ec: ExecutionContext): Future[Option[EPFLUser]] =
     es.execute {
