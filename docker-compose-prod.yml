@@ -19,14 +19,14 @@ services:
       - EPFLBOT_TOKEN
       - EPFLBOT_ELASTICSEARCH_HOST=elasticsearch
       - EPFLBOT_INTERFACE=https://epfl.life
-      - EPFLBOT_PORT=80
+      - EPFLBOT_PORT=443
     networks:
       - front
       - default
     labels:
       - traefik.enable=true
       - traefik.frontend.rule=Host:epfl.life,www.epfl.life
-      - traefik.port=80
+      - traefik.port=443
       - traefik.docker.network=front
 
   elasticsearch:
