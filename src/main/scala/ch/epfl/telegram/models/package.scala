@@ -38,10 +38,11 @@ package object models {
 
     @implicitNotFound(
       "No Encoder for type ${T} found. Use 'import io.circe.generic.auto._' or provide an implicit Encoder instance ")
-    implicit def indexableWithCirce[T](implicit encoder: Encoder[T], printer: Json => String = Printer.noSpaces.copy(dropNullKeys = true).pretty): Indexable[T] = new Indexable[T] {
+    implicit def indexableWithCirce[T](
+        implicit encoder: Encoder[T],
+        printer: Json => String = Printer.noSpaces.copy(dropNullKeys = true).pretty): Indexable[T] = new Indexable[T] {
       override def json(t: T): String = printer(encoder(t))
     }
   }
-
 
 }
