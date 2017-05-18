@@ -13,8 +13,7 @@ import net.ruippeixotog.scalascraper.model.Element
 /**
   * Add Menus (EPFL Menus) useful commands.
   */
-trait Menus extends Commands with Callbacks {
-  _: TelegramBot with ChatActions =>
+trait Menus extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   import Restos.callbackPrefix
 

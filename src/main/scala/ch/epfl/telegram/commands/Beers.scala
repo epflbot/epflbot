@@ -17,8 +17,7 @@ import scala.util.Random
 /**
   * Add Satellite useful commands (beer...).
   */
-trait Beers extends Commands with Callbacks {
-  _: TelegramBot with ChatActions =>
+trait Beers extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   import Sat.callbackPrefix
 

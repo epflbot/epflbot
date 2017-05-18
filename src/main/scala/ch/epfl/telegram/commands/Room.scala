@@ -25,8 +25,7 @@ import scala.util.control.Breaks._
   * Source original = "https://ewa.epfl.ch/room/Default.aspx?room=bc01"
   * Still not deal with  wrong argument....
   */
-trait Room extends Commands {
-  _: TelegramBot with ChatActions =>
+trait Room extends Commands { _: TelegramBot with ChatActions =>
 
   on("/room", "current room occupancy") { implicit msg => args =>
     typing

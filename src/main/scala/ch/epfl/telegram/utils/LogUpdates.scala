@@ -10,4 +10,3 @@ trait LogUpdates extends TelegramBot {
     super.onUpdate(u)
   }
 }
-

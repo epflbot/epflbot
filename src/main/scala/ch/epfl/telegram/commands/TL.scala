@@ -17,8 +17,7 @@ import scala.util.Try
 /**
   * Add TL (transport public Lausanne) useful commands.
   */
-trait TL extends Commands with Callbacks {
-  _: TelegramBot with ChatActions =>
+trait TL extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   private val TL_TAG = "TL_TAG"
 

@@ -16,8 +16,7 @@ import org.joda.time.DateTime
 /**
   * Add bus (Transport Region Morges) useful commands.
   */
-trait Bus extends Commands with Callbacks {
-  _: TelegramBot with ChatActions =>
+trait Bus extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   private val BUS_TAG = "BUS_TAG"
 
