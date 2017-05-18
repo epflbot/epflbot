@@ -14,7 +14,7 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatterBuilder, PeriodFor
 /**
   * Add Events (EPFL Events) useful commands.
   */
-trait Events extends Commands with Callbacks { _: TelegramBot =>
+trait Events extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   import Events.callbackPrefix
 
@@ -23,6 +23,7 @@ trait Events extends Commands with Callbacks { _: TelegramBot =>
     */
   on("/events", "upcoming events @ EPFL") { implicit msg => _ =>
     // TODO offer way to search for events
+    typing
     Events.events = EventsScraper.retrieveEvents("?", 1) // TODO DIRTY !!!!!!! ^^
     Events.events match {
       case event :: _ =>

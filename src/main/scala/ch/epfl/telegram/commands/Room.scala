@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-import info.mukel.telegrambot4s.api.{Commands, TelegramBot}
+import info.mukel.telegrambot4s.api.{ChatActions, Commands, TelegramBot}
 import org.joda.time.DateTime
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
@@ -25,9 +25,11 @@ import scala.util.control.Breaks._
   * Source original = "https://ewa.epfl.ch/room/Default.aspx?room=bc01"
   * Still not deal with  wrong argument....
   */
-trait Room extends Commands { _: TelegramBot =>
+trait Room extends Commands {
+  _: TelegramBot with ChatActions =>
 
   on("/room", "current room occupancy") { implicit msg => args =>
+    typing
     val responses = Room.get(URLEncoder.encode(args mkString " ", "UTF-8"))
     reply(responses)
   }
