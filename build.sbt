@@ -28,7 +28,7 @@ libraryDependencies ++= {
   val elasticV = "5.4.3"
 
   Seq(
-    "info.mukel"                 %% "telegrambot4s"                 % "2.2.7-SNAPSHOT",
+    "info.mukel"                 %% "telegrambot4s"                 % "2.2.8-SNAPSHOT",
     "net.ruippeixotog"           %% "scala-scraper"                 % "1.2.1",
     "com.github.nscala-time"     %% "nscala-time"                   % "2.16.0",
     "com.sksamuel.elastic4s"     %% "elastic4s-core"                % elasticV,
