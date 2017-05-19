@@ -13,7 +13,7 @@ import net.ruippeixotog.scalascraper.model.Element
 /**
   * Add Menus (EPFL Menus) useful commands.
   */
-trait Menus extends Commands with Callbacks { _: TelegramBot =>
+trait Menus extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   import Restos.callbackPrefix
 
@@ -21,6 +21,7 @@ trait Menus extends Commands with Callbacks { _: TelegramBot =>
     * Crude command to get today EPFL menus. (that are not "already finished")
     */
   on("/menus", "today's menus") { implicit msg => args =>
+    typing
     val restos = MenusScraper.retrieveMenus().groupBy(_.resto).filterKeys {
       def buildPredicate(key: String, args: Seq[String]): Boolean = args match {
         case Seq(resto, tail @ _ *) =>

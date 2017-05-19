@@ -17,7 +17,7 @@ import scala.util.Random
 /**
   * Add Satellite useful commands (beer...).
   */
-trait Beers extends Commands with Callbacks { _: TelegramBot =>
+trait Beers extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   import Sat.callbackPrefix
 
@@ -25,6 +25,7 @@ trait Beers extends Commands with Callbacks { _: TelegramBot =>
     * Crude command to get beers !.
     */
   on("/beers", "beers ... what else ") { implicit msg => _ =>
+    typing
     Sat.setCached(SatScraper.parseSat())
     Sat.cached match {
       case Some(sat) =>

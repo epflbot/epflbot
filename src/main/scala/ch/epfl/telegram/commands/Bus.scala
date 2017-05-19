@@ -3,7 +3,7 @@ package ch.epfl.telegram.commands
 import com.lightbend.emoji.ShortCodes.Defaults._
 import com.lightbend.emoji.ShortCodes.Implicits._
 import info.mukel.telegrambot4s.Implicits.Extractor
-import info.mukel.telegrambot4s.api.{Callbacks, Commands, TelegramBot}
+import info.mukel.telegrambot4s.api.{Callbacks, ChatActions, Commands, TelegramBot}
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.methods.{EditMessageText, ParseMode}
 import info.mukel.telegrambot4s.models.{InlineKeyboardButton, InlineKeyboardMarkup}
@@ -16,7 +16,7 @@ import org.joda.time.DateTime
 /**
   * Add bus (Transport Region Morges) useful commands.
   */
-trait Bus extends Commands with Callbacks { _: TelegramBot =>
+trait Bus extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   private val BUS_TAG = "BUS_TAG"
 
@@ -40,6 +40,7 @@ trait Bus extends Commands with Callbacks { _: TelegramBot =>
   on("/bus", "interactive 701 and 705 bus schedule") { implicit msg =>
     {
       case Seq(Extractor.Int(busNumber)) if supportedBuses contains busNumber =>
+        typing
         reply(horairesMessage(busNumber, busCode(busNumber).head._1),
               parseMode = Some(ParseMode.Markdown),
               replyMarkup = Some(markup(busNumber)))

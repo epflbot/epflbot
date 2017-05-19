@@ -1,7 +1,7 @@
 package ch.epfl.telegram
 
 import ch.epfl.telegram.commands._
-import ch.epfl.telegram.utils.AsyncUpdates
+import ch.epfl.telegram.utils.{AsyncUpdates, LogUpdates}
 import info.mukel.telegrambot4s.api._
 
 import scala.io.Source
@@ -33,7 +33,8 @@ object EpflBot
     /* The access-control trait must be last */
     with TequilaAuthentication
     /* All updates are processed asynchronously */
-    with AsyncUpdates {
+    with AsyncUpdates
+    with LogUpdates {
 
   lazy val token = Properties
     .envOrNone("EPFLBOT_TOKEN")

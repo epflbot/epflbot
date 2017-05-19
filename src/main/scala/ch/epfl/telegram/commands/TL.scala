@@ -17,7 +17,7 @@ import scala.util.Try
 /**
   * Add TL (transport public Lausanne) useful commands.
   */
-trait TL extends Commands with Callbacks { _: TelegramBot =>
+trait TL extends Commands with Callbacks { _: TelegramBot with ChatActions =>
 
   private val TL_TAG = "TL_TAG"
 
@@ -34,6 +34,7 @@ trait TL extends Commands with Callbacks { _: TelegramBot =>
     * Crude command to get next next M1 departures, from EPFL, direction Flon.
     */
   on("/metro", "interactive metro schedule") { implicit msg => _ =>
+    typing
     reply(horairesMessage("Lausanne-Flon"), parseMode = ParseMode.Markdown, replyMarkup = markup)
   }
 
@@ -90,7 +91,7 @@ trait TL extends Commands with Callbacks { _: TelegramBot =>
   * TODO: Use https://github.com/RemembrMoe/tl-api
   */
 object TLScraper {
-  val baseUrl = "http://www.t-l.ch/tl-live-mobile/"
+  val baseUrl = "https://www.t-l.ch/tl-live-mobile/"
 
   /**
     * Heavily hardcoded scraping. Find next M1 departures from EPFL, direction Flon (departing now).
