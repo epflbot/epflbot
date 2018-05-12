@@ -4,9 +4,9 @@ import java.time.format.DateTimeFormatter
 import sbt.Package.ManifestAttributes
 
 name := "EPFLBot"
-version := "0.2.0"
+version := "0.3.0"
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.6"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -22,26 +22,26 @@ resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += Resolver.typesafeIvyRepo("releases")
 
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 
 libraryDependencies ++= {
-  val elasticV = "5.4.3"
+  val elasticV = "5.4.15"
 
   Seq(
-    "info.mukel"                 %% "telegrambot4s"                 % "2.2.8-SNAPSHOT",
+    "info.mukel"                 %% "telegrambot4s"                 % "2.9.5",
     "net.ruippeixotog"           %% "scala-scraper"                 % "1.2.1",
     "com.github.nscala-time"     %% "nscala-time"                   % "2.16.0",
     "com.sksamuel.elastic4s"     %% "elastic4s-core"                % elasticV,
     "com.sksamuel.elastic4s"     %% "elastic4s-tcp"                 % elasticV,
     "com.sksamuel.elastic4s"     %% "elastic4s-circe"               % elasticV,
-    "com.lightbend"              %% "emoji"                         % "1.1.1",
-    "com.iheart"                 %% "ficus"                         % "1.4.0",
+    "com.lightbend"              %% "emoji"                         % "1.2.0",
+    "com.iheart"                 %% "ficus"                         % "1.4.3",
     "com.vividsolutions"         % "jts"                            % "1.13",
-    "org.locationtech.spatial4j" % "spatial4j"                      % "0.6",
+    "org.locationtech.spatial4j" % "spatial4j"                      % "0.7",
     "ch.qos.logback"             % "logback-classic"                % "1.2.3",
     "ch.qos.logback"             % "logback-access"                 % "1.2.3",
-    "com.internetitem"           % "logback-elasticsearch-appender" % "1.5",
-    "org.apache.logging.log4j"   % "log4j-to-slf4j"                 % "2.8.2",
+    "com.internetitem"           % "logback-elasticsearch-appender" % "1.6",
+    "org.apache.logging.log4j"   % "log4j-to-slf4j"                 % "2.11.0",
     "com.unboundid"              % "unboundid-ldapsdk"              % "3.2.1"
   )
 }

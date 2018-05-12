@@ -24,7 +24,7 @@ trait Menus extends Commands with Callbacks { _: TelegramBot with ChatActions =>
     typing
     val restos = MenusScraper.retrieveMenus().groupBy(_.resto).filterKeys {
       def buildPredicate(key: String, args: Seq[String]): Boolean = args match {
-        case Seq(resto, tail @ _ *) =>
+        case Seq(resto, tail @ _*) =>
           key.toLowerCase.contains(resto.toLowerCase) ||
             resto.toLowerCase.contains(key.toLowerCase) ||
             buildPredicate(key, tail)
