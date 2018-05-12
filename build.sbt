@@ -37,7 +37,7 @@ libraryDependencies ++= {
     "com.lightbend"              %% "emoji"                         % "1.2.0",
     "com.iheart"                 %% "ficus"                         % "1.4.3",
     "com.vividsolutions"         % "jts"                            % "1.13",
-    "org.locationtech.spatial4j" % "spatial4j"                      % "0.7",
+    "org.locationtech.spatial4j" % "spatial4j"                      % "0.6",
     "ch.qos.logback"             % "logback-classic"                % "1.2.3",
     "ch.qos.logback"             % "logback-access"                 % "1.2.3",
     "com.internetitem"           % "logback-elasticsearch-appender" % "1.6",
